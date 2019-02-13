@@ -1,0 +1,1 @@
+scelgo(X,Y) :- spot(X,Y).
