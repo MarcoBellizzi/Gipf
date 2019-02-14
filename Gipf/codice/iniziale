@@ -1,1 +1,14 @@
-scelgo(X,Y) :- spot(X,Y).
+scelgo(X,Y,A) | scelgo(X,Y,B) | no(X,Y) :- start(X,Y,A,B).
+
+:- not #count { X,Y : scelgo(X,Y,A) } = 1.
+
+
+
+nuova(X,Y,C) :- scelgo(X,B,1), pedina(X,Z,C), Y=Z-2.
+
+nuova(X,Y,C) :- scelgo(X,B,4), pedina(X,Z,C), Y=Z+2.
+
+nuova(X,Y,C) :- scelgo(A,B,2), A+B=S, pedina(Z,W,C), Z+W=S, X=Z-1, Y=W-1.
+
+nuova(X,Y,C) :- scelgo(A,B,3), B-A=S, pedina(Z,W,C), W-Z=S, X=Z+1, Y=W+1.
+

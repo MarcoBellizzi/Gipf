@@ -1,0 +1,8 @@
+scelgo(4,16,1).
+
+pedina(4,14,bianca).
+pedina(4,12,bianca).
+
+pedinaNuova(X,W,COL) :- scelgo(X,Y,1), pedina(X,B,COL), W=B-2.
+
+

@@ -1,0 +1,4 @@
+pedina(1,2,bianca).
+spot(4,5,su_destra).
+
+ciao(X) :- spot(_,_,X).
