@@ -10,7 +10,7 @@ public class Start {     // rinominare start
 	int x;
 	
 	@Param(1)
-	int y;
+	int y;  
 	
 	@Param(2)
 	int direzione1;
