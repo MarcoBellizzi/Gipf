@@ -4,7 +4,7 @@ import it.unical.mat.embasp.languages.Id;
 import it.unical.mat.embasp.languages.Param;
 
 @Id("start")
-public class Start {     // rinominare start
+public class Start { 
 
 	@Param(0)
 	int x;

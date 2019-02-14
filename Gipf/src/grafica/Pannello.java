@@ -214,6 +214,7 @@ public class Pannello extends JPanel {
 			ASPMapper.getInstance().registerClass(Start.class);
 			ASPMapper.getInstance().registerClass(Scelgo.class);
 			ASPMapper.getInstance().registerClass(Pedina.class);
+			ASPMapper.getInstance().registerClass(Nuova.class);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -242,6 +243,13 @@ public class Pannello extends JPanel {
 				e.printStackTrace();
 			}	
 		}
+		for(Pedina pedina : pedineBianche) {
+			try {
+				facts.addObjectInput(pedina);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}	
+		}
 		handler.addProgram(facts);
 
 		InputProgram encoding = new ASPInputProgram();
@@ -252,6 +260,9 @@ public class Pannello extends JPanel {
 
 		AnswerSets answers = (AnswerSets) o;
 
+		ripristina(pedineNere,0);
+		ripristina(pedineBianche,1);
+		
 		sceltadlv = new Scelgo(100,100,"");  // se non c'è nessuno scelgo
 		int as = 0;
 		int oggetti = 0;
@@ -268,14 +279,24 @@ public class Pannello extends JPanel {
 						sceltadlv = (Scelgo) obj;
 					}
 					
-					if(obj instanceof Pedina) {
-						Pedina pedina = (Pedina) obj;
+					if(obj instanceof Nuova) {
+						Nuova pedina = (Nuova) obj;
 						System.out.println(pedina);
+						
 						if(pedina.getColore()==1) {
 							for(Pedina bianca : pedineBianche) {
 								if(bianca.getX()==8 && bianca.getY()==0) {
 									bianca.setX(pedina.getX());
 									bianca.setY(pedina.getY());
+									break;
+								}
+							}
+						}
+						else {
+							for(Pedina nera : pedineNere) {
+								if(nera.getX()==0 && nera.getY()==0) {
+									nera.setX(pedina.getX());
+									nera.setY(pedina.getY());
 									break;
 								}
 							}
@@ -295,6 +316,20 @@ public class Pannello extends JPanel {
 		System.out.println("scelte : " + scelgo);
 		System.out.println("coordinate della scelta : " + sceltadlv.getX() + "  " + sceltadlv.getY());
 
+	}
+	
+	public static void ripristina(ArrayList<Pedina> lista, int colore) {
+		lista.clear();
+		if(colore==0) {
+			for(int i=0; i<12; i++) {
+				lista.add(new Pedina(0,0,0));
+			}
+		}
+		else {
+			for(int i=0; i<12; i++) {
+				lista.add(new Pedina(8,0,1));
+			}
+		}
 	}
 
 	@Override
@@ -330,6 +365,7 @@ public class Pannello extends JPanel {
 				for(int i=0; i<2; i++) {
 					int dir = punto.getDirezione1();
 					if(i==1) dir = punto.getDirezione2();
+					
 					if(dir == 1)  g.drawImage(puntoVerde, punto.getX()*60-20+110, punto.getY()*35-20+70-70, 40, 40, this);
 					if(dir == 2)  g.drawImage(puntoVerde, punto.getX()*60-20+110+60, punto.getY()*35-20+70-35, 40, 40, this);
 					if(dir == 3)  g.drawImage(puntoVerde, punto.getX()*60-20+110+60, punto.getY()*35-20+70+35, 40, 40, this);
