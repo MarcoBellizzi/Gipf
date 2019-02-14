@@ -1,9 +1,0 @@
-numero(1..10).
-
-si(X) | no(X) :- numero(X).
-
-scelto :- si(X).
-
-:- not scelto.
-
-:- #count { X : si(X) } > 1.

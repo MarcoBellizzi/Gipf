@@ -1,6 +1,6 @@
 scelgo(X,Y,A) | scelgo(X,Y,B) | no(X,Y) :- start(X,Y,A,B).
 
-:- not #count { X,Y : scelgo(X,Y,A) } = 1.
+%:- not #count { X,Y : scelgo(X,Y,A) } = 1.
 
 
 pedina(X,Y,1) :- scelgo(X,Y,D). 
@@ -31,10 +31,10 @@ nuova(A,B,C) :- connessa(X,Y,6), pedina(X,Y,C), A=X-1, B=Y-1.
 nuova(X,Y,C) :- pedina(X,Y,C), scelgo(A,B,D), not connessa(X,Y,D).
 
 
-:- nuova(X,Y,C), start(X,Y,A,B).
+%:- nuova(X,Y,C), start(X,Y,A,B).
 
 
-faiQualcosa :- #count { X,Y : connessa(X,Y,D), connessa(A,B,D), celleVicine(X,Y,A,B) } > 3.
+faiQualcosa :- #count {  : pedina(X,Y,C), pedina( } > 3.
 
 
 
