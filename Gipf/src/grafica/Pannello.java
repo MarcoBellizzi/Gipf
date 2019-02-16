@@ -35,6 +35,10 @@ public class Pannello extends JPanel {
 	ArrayList<Pedina> pedineNere;
 	ArrayList<Pedina> pedineBianche;
 	Start[] suggerimento;     // per i suggerimenti grafici
+
+	static int catturateBianche;
+	static int catturateNere;
+
 	boolean scelto;
 
 	Bottone bottone;
@@ -88,12 +92,12 @@ public class Pannello extends JPanel {
 
 				for(Start punto : listaSpot) {
 					if(punto.isFocus(x, y)) {
-						
+
 						int x = punto.getX();
 						int y = punto.getY();
 						int dir1 = punto.getDirezione1();
 						int dir2 = punto.getDirezione2();
-						
+
 						if(dir1 == 1) suggerimento[0].set(x,y-2,dir1);
 						if(dir1 == 2)  suggerimento[0].set(x+1,y-1,dir1);
 						if(dir1 == 3) suggerimento[0].set(x+1,y+1,dir1);
@@ -106,27 +110,23 @@ public class Pannello extends JPanel {
 						}
 						else {
 							if(dir2 == 1) suggerimento[1].set(x,y-2,dir2);
-							if(dir2 == 2)  suggerimento[1].set(x+1,y-1,dir2);
+							if(dir2 == 2) suggerimento[1].set(x+1,y-1,dir2);
 							if(dir2 == 3) suggerimento[1].set(x+1,y+1,dir2);
 							if(dir2 == 4) suggerimento[1].set(x,y+2,dir2);
 							if(dir2 == 5) suggerimento[1].set(x-1,y+1,dir2);
-							if(dir2 == 6)  suggerimento[1].set(x-1,y-1,dir2);
+							if(dir2 == 6) suggerimento[1].set(x-1,y-1,dir2);
 						}
 
+						sceltadlv = new Scelgo(x,y,10); // riempire
 						scelto = true;
 					}
 				}
 
 				for(int i=0; i<2; i++) {
 					if(suggerimento[i].isFocus(x, y)) {
-						for(Pedina pedina : pedineNere ) {
-							if(pedina.getX()==0 && pedina.getY()==0) {
-								pedina.setX(suggerimento[i].getX());
-								pedina.setY(suggerimento[i].getY());
-								break;
-							}
-						}
+						sceltadlv.setDirezione(suggerimento[i].getDirezione1());
 						scelto = false;
+						muovi();
 					}
 				}
 
@@ -193,7 +193,7 @@ public class Pannello extends JPanel {
 		for(int i=0; i<12; i++) {
 			pedineNere.add(new Pedina(0,0,0));
 		}
-		
+
 		pedineBianche = new ArrayList<Pedina>(); 
 		for(int i=0; i<12; i++) {
 			pedineBianche.add(new Pedina(8,0,1));
@@ -208,26 +208,27 @@ public class Pannello extends JPanel {
 
 	public void initDlv() {
 		handler = new DesktopHandler(new DLV2DesktopService("lib/dlv2"));
-		
+
 		// register the class for reflection
 		try {
 			ASPMapper.getInstance().registerClass(Start.class);
 			ASPMapper.getInstance().registerClass(Scelgo.class);
 			ASPMapper.getInstance().registerClass(Pedina.class);
-			ASPMapper.getInstance().registerClass(Nuova.class);
+			ASPMapper.getInstance().registerClass(Finale.class);
+			ASPMapper.getInstance().registerClass(Catturate.class);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
-		sceltadlv = new Scelgo(100,100,"");
 
-	//	scegli();
-		
+		sceltadlv = new Scelgo(100,100,10);
+		catturateBianche = 0;
+		catturateNere = 0;
+
 	}
 
 	public void scegli() {
 		handler.removeAll();
-		
+
 		InputProgram facts = new ASPInputProgram();
 		for(Start punto : listaSpot) {
 			try {
@@ -260,16 +261,28 @@ public class Pannello extends JPanel {
 
 		AnswerSets answers = (AnswerSets) o;
 
-		ripristina(pedineNere,0);
-		ripristina(pedineBianche,1);
-		
-		sceltadlv = new Scelgo(100,100,"");  // se non c'è nessuno scelgo
+		sceltadlv = new Scelgo(100,100,10);  // se non c'è nessuno scelgo
 		int as = 0;
 		int oggetti = 0;
 		int scelgo = 0;
 		for(AnswerSet a : answers.getAnswersets()){
 			as++;
 			try {
+				for(Object obj : a.getAtoms()) {
+					if(obj instanceof Catturate) {
+						if(((Catturate)obj).getColore() == 0 ) {
+							catturateNere += ((Catturate) obj).getNumero();
+						}
+						else {
+							catturateBianche += ((Catturate) obj).getNumero();
+						}
+					}
+				}
+
+				ripristina(pedineNere,0);
+				ripristina(pedineBianche,1);
+
+
 				for(Object obj : a.getAtoms()){
 					oggetti++;
 
@@ -278,11 +291,11 @@ public class Pannello extends JPanel {
 						scelgo++;
 						sceltadlv = (Scelgo) obj;
 					}
-					
-					if(obj instanceof Nuova) {
-						Nuova pedina = (Nuova) obj;
+
+					if(obj instanceof Finale) {
+						Finale pedina = (Finale) obj;
 						System.out.println(pedina);
-						
+
 						if(pedina.getColore()==1) {
 							for(Pedina bianca : pedineBianche) {
 								if(bianca.getX()==8 && bianca.getY()==0) {
@@ -302,8 +315,8 @@ public class Pannello extends JPanel {
 							}
 						}
 					}
-					
-					
+
+
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -317,16 +330,94 @@ public class Pannello extends JPanel {
 		System.out.println("coordinate della scelta : " + sceltadlv.getX() + "  " + sceltadlv.getY());
 
 	}
-	
+
+	public void muovi() {
+		handler.removeAll();
+
+		InputProgram facts = new ASPInputProgram();
+
+		try {
+			facts.addObjectInput(sceltadlv);
+			for(Pedina pedina : pedineNere) {
+				facts.addObjectInput(pedina);
+			}
+			for(Pedina pedina : pedineBianche) {
+				facts.addObjectInput(pedina);
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+
+		handler.addProgram(facts);
+
+		InputProgram encoding = new ASPInputProgram();
+		encoding.addFilesPath("codice/prova");
+		handler.addProgram(encoding);
+
+		Output o =  handler.startSync();    // esegue il dlv
+
+		AnswerSets answers = (AnswerSets) o;
+
+		for(AnswerSet a : answers.getAnswersets()) {
+			try {
+
+				for(Object obj : a.getAtoms()) {
+					if(obj instanceof Catturate) {
+						if(((Catturate)obj).getColore() == 0 ) {
+							catturateNere += ((Catturate) obj).getNumero();
+						}
+						else {
+							catturateBianche += ((Catturate) obj).getNumero();
+						}
+					}
+				}
+
+				ripristina(pedineNere,0);
+				ripristina(pedineBianche,1);
+
+
+				for(Object obj : a.getAtoms()) {
+					if(obj instanceof Finale) {
+						Finale pedina = (Finale) obj;
+						System.out.println(pedina);
+
+						if(pedina.getColore()==1) {
+							for(Pedina bianca : pedineBianche) {
+								if(bianca.getX()==8 && bianca.getY()==0) {
+									bianca.setX(pedina.getX());
+									bianca.setY(pedina.getY());
+									break;
+								}
+							}
+						}
+						else {
+							for(Pedina nera : pedineNere) {
+								if(nera.getX()==0 && nera.getY()==0) {
+									nera.setX(pedina.getX());
+									nera.setY(pedina.getY());
+									break;
+								}
+							}
+						}
+					}
+				}
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+
+	}
+
 	public static void ripristina(ArrayList<Pedina> lista, int colore) {
 		lista.clear();
+
 		if(colore==0) {
-			for(int i=0; i<12; i++) {
+			for(int i=0; i<12-catturateNere; i++) {
 				lista.add(new Pedina(0,0,0));
 			}
 		}
 		else {
-			for(int i=0; i<12; i++) {
+			for(int i=0; i<12-catturateBianche; i++) {
 				lista.add(new Pedina(8,0,1));
 			}
 		}
@@ -348,7 +439,7 @@ public class Pannello extends JPanel {
 			g.drawImage(damaNera, pedina.getX()*60-20+110, pedina.getY()*35-20+70, 40, 40, this);
 		}
 		g.drawString(""+countPedine, 140, 80);
-		
+
 		int countBianche = 0;
 		for(Pedina pedina : pedineBianche) {
 			if(pedina.getX()==8 && pedina.getY()==0) {
@@ -360,12 +451,12 @@ public class Pannello extends JPanel {
 
 		for(Start punto : listaSpot) {
 			if(punto.isFocus(x, y)) {
-				g.drawImage(puntoRosso, punto.getX()*60-20+110, punto.getY()*35-20+70, 40, 40, this);  // fare funzione
+				g.drawImage(damaNera, punto.getX()*60-20+110, punto.getY()*35-20+70, 40, 40, this);  // fare funzione
 
 				for(int i=0; i<2; i++) {
 					int dir = punto.getDirezione1();
 					if(i==1) dir = punto.getDirezione2();
-					
+
 					if(dir == 1)  g.drawImage(puntoVerde, punto.getX()*60-20+110, punto.getY()*35-20+70-70, 40, 40, this);
 					if(dir == 2)  g.drawImage(puntoVerde, punto.getX()*60-20+110+60, punto.getY()*35-20+70-35, 40, 40, this);
 					if(dir == 3)  g.drawImage(puntoVerde, punto.getX()*60-20+110+60, punto.getY()*35-20+70+35, 40, 40, this);
@@ -379,10 +470,13 @@ public class Pannello extends JPanel {
 		if(scelto) {
 			for(int i=0; i<2; i++) {
 				g.drawImage(puntoVerde, suggerimento[i].getX()*60-20+110, suggerimento[i].getY()*35-20+70, 40, 40, this);
+				g.drawImage(damaNera, sceltadlv.getX()*60-20+110, sceltadlv.getY()*35-20+70, 40, 40, this);			
 			}
 		}
+		else {
+			g.drawImage(puntoRosso, sceltadlv.getX()*60-20+110, sceltadlv.getY()*35-20+70, 40, 40, this);			
+		}
 
-		g.drawImage(puntoRosso, sceltadlv.getX()*60-20+110, sceltadlv.getY()*35-20+70, 40, 40, this);
 
 
 

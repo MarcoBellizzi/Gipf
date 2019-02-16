@@ -13,14 +13,14 @@ public class Scelgo {
 	int y;
 	
 	@Param(2)
-	String direzione;
+	int direzione;
 	
 	public Scelgo() {
 		this.x = 0;
 		this.y = 0;
 	}
 	
-	public Scelgo(int x, int y, String direzione) {
+	public Scelgo(int x, int y, int direzione) {
 		this.x = x;
 		this.y = y;
 		this.direzione = direzione;
@@ -30,13 +30,13 @@ public class Scelgo {
 	
 	public int getY() { return y; }
 	
-	public String getDirezione() { return direzione; }
+	public int getDirezione() { return direzione; }
 
 	public void setX(int x) { this.x = x; }
 	
 	public void setY(int y) { this.y = y; }
 	
-	public void setDirezione(String direzione) { this.direzione = direzione; }
+	public void setDirezione(int direzione) { this.direzione = direzione; }
 	
 	@Override
 	public String toString() {

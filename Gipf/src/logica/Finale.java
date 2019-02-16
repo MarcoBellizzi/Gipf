@@ -3,8 +3,8 @@ package logica;
 import it.unical.mat.embasp.languages.Id;
 import it.unical.mat.embasp.languages.Param;
 
-@Id("nuova")
-public class Nuova {
+@Id("finale")
+public class Finale {
 
 	@Param(0)
 	int x;
@@ -19,9 +19,9 @@ public class Nuova {
 	@Param(2)
 	int colore;
 
-	public Nuova() {}
+	public Finale() {}
 	
-	public Nuova(int x, int y, int colore) {
+	public Finale(int x, int y, int colore) {
 		this.x = x;
 		this.y = y;
 		this.colore = colore;
@@ -41,7 +41,7 @@ public class Nuova {
 
 	@Override
 	public String toString() {
-		return "Nuova [x=" + x + ", y=" + y + ", colore=" + colore + "]";
+		return "Finale [x=" + x + ", y=" + y + ", colore=" + colore + "]";
 	}
 	
 	
