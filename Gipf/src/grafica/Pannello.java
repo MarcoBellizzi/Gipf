@@ -27,32 +27,30 @@ public class Pannello extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	static int x = 0;
-	static int y = 0;
+	static int x;   // muose
+	static int y;
 
-	ArrayList<Punto> listaPunti;    // da rimuovere
+	static Handler handler;  
+
 	ArrayList<Start> listaSpot;
 	ArrayList<Pedina> pedineNere;
 	ArrayList<Pedina> pedineBianche;
 	Start[] suggerimento;     // per i suggerimenti grafici
 
+	Scelgo sceltadlv;
+
+	static int scelta;   // per la direzione in cui mangiare se ce ne sono due
+	static boolean deviScegliere;
+
+	boolean scelto;   // posizionamento pediana nero
+
 	static int catturateBianche;
 	static int catturateNere;
-	
-	static int scelta = 0;
-	static boolean deviScegliere = false;
-
-	boolean scelto;
 
 	Bottone bottone;
-	
 	Bottone bottoneScelta;
 
-	Image scacchiera, damaNera, damaBianca, puntoRosso, puntoVerde, Iscelta;
-
-	public static Handler handler;  
-
-	Scelgo sceltadlv;
+	Image scacchiera, damaNera, damaBianca, puntoRosso, puntoVerde, Iscelta, gipfNero, gipfBianco;
 
 	public Pannello() {
 		initGUI();
@@ -70,23 +68,23 @@ public class Pannello extends JPanel {
 			puntoRosso = ImageIO.read(new File("src/grafica/puntoRosso.png"));
 			puntoVerde = ImageIO.read(new File("src/grafica/puntoVerde.png"));
 			Iscelta = ImageIO.read(new File("src/grafica/scelta.png"));
+			gipfBianco = ImageIO.read(new File("src/grafica/gipfBianco.png"));
+			gipfNero = ImageIO.read(new File("src/grafica/gipfNero.png"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		bottone = new Bottone(200,10,80,80);
-		bottoneScelta = new Bottone(300,10,80,80);
+		bottoneScelta = new Bottone(450,10,80,80);
+		scelta = 0;
+		deviScegliere = false;
+		x = 0;
+		y = 0;
+		sceltadlv = new Scelgo(100,100,10);
+		catturateBianche = 0;
+		catturateNere = 0;
 	}
 
-	
-	public static int focusScelta(int x, int y) {
-		if(x>50 && x< 70 && y>552 && y<572) return 1;
-		if(x>95 && x< 115 && y>570 && y<590) return 2;
-		if(x>95 && x< 115 && y>630 && y<650) return 3;
 
-		return 0;
-	}
-	
-	
 	public void initEH() {
 		this.addMouseMotionListener(new MouseMotionAdapter() {
 
@@ -134,7 +132,7 @@ public class Pannello extends JPanel {
 							if(dir2 == 6) suggerimento[1].set(x-1,y-1,dir2);
 						}
 
-						sceltadlv = new Scelgo(x,y,10); // riempire
+						sceltadlv = new Scelgo(x,y,10); 
 						scelto = true;
 					}
 				}
@@ -143,18 +141,19 @@ public class Pannello extends JPanel {
 					if(suggerimento[i].isFocus(x, y)) {
 						sceltadlv.setDirezione(suggerimento[i].getDirezione1());
 						scelto = false;
-						muovi();
+						muoviNero();
 					}
 				}
 
 				if(bottone.isFocus(x, y)) {
-					scegli();
+					muoviBianco();
 				}
-				
+
 				if(bottoneScelta.isFocus(x, y)) {
-					scegli2();
+					deviScegliere = false;
+					muoviNero2();
 				}
-				
+
 				scelta = focusScelta(x,y);
 
 			}
@@ -164,9 +163,8 @@ public class Pannello extends JPanel {
 	}
 
 	public void initListe() {
-		listaPunti = new ArrayList<Punto>();
 		listaSpot = new ArrayList<Start>();
-		for(int i=0; i<9; i++) {               // Inizialiazzazione scacchiera
+		for(int i=0; i<9; i++) {          
 			for(int j=0; j<17; j++) {
 				if(i%2 == j%2) {
 					if(i==0 && j==4) {
@@ -205,9 +203,6 @@ public class Pannello extends JPanel {
 					else if(i==0 && j>5 && j<11) {
 						listaSpot.add(new Start(i,j,2, 3));
 					}
-					else if(i+j>4 && i-j<4 && i+j<20 && j-i<12) {
-						listaPunti.add(new Punto(i,j));
-					}
 				}					
 			}
 		}
@@ -245,13 +240,9 @@ public class Pannello extends JPanel {
 			e.printStackTrace();
 		}
 
-		sceltadlv = new Scelgo(100,100,10);
-		catturateBianche = 0;
-		catturateNere = 0;
-
 	}
 
-	public void scegli() {
+	public void muoviBianco() {
 		handler.removeAll();
 
 		InputProgram facts = new ASPInputProgram();
@@ -338,8 +329,6 @@ public class Pannello extends JPanel {
 							}
 						}
 					}
-
-
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -353,14 +342,14 @@ public class Pannello extends JPanel {
 
 	}
 
-	public void muovi() {
+	public void muoviNero() {
 		handler.removeAll();
 
 		InputProgram facts = new ASPInputProgram();
 
 		try {
 			facts.addObjectInput(sceltadlv);
-			
+
 			for(Pedina pedina : pedineNere) {
 				facts.addObjectInput(pedina);
 			}
@@ -381,12 +370,10 @@ public class Pannello extends JPanel {
 
 		AnswerSets answers = (AnswerSets) o;
 
-		deviScegliere = false;
-		
 		for(AnswerSet p : answers.getAnswersets()) {
 			try {
 
-				
+
 				for(Object object : p.getAtoms()) {
 					if(object instanceof Direzione) {    // eccezione
 						deviScegliere = true;
@@ -400,11 +387,10 @@ public class Pannello extends JPanel {
 						}
 					}
 				}
-				
-				
+
 				ripristina(pedineNere,0);
 				ripristina(pedineBianche,1);
-				
+
 				if(deviScegliere) {
 					for(Object op : p.getAtoms()) {
 						if(op instanceof Nuova) {
@@ -456,25 +442,23 @@ public class Pannello extends JPanel {
 						}
 					}
 				}
-				
+
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
 	}
-	
-	
-	
-	public void scegli2() {
-		
-		
+
+
+
+	public void muoviNero2() {
 		handler.removeAll();
 
 		InputProgram facts = new ASPInputProgram();
 
 		try {
 			facts.addObjectInput(new Direzione(scelta));
-			
+
 			for(Pedina pedina : pedineNere) {
 				facts.addObjectInput(pedina);
 			}
@@ -492,16 +476,13 @@ public class Pannello extends JPanel {
 		handler.addProgram(encoding);
 
 		Output o =  handler.startSync(); 
-
 		AnswerSets answers = (AnswerSets) o;
 
 		int as = 0;
-		
 		for(AnswerSet a : answers.getAnswersets()) {
 			try {
-
 				as++;
-				
+
 				for(Object obj : a.getAtoms()) {
 					if(obj instanceof Catturate) {
 						if(((Catturate)obj).getColore() == 0 ) {
@@ -516,13 +497,12 @@ public class Pannello extends JPanel {
 				ripristina(pedineNere,0);
 				ripristina(pedineBianche,1);
 
-
 				System.out.println("ci sono");
-				
+
 				for(Object obj : a.getAtoms()) {
 					if(obj instanceof Finale) {
 						Finale pedina = (Finale) obj;
-						
+
 						System.out.println(pedina);
 
 						if(pedina.getColore()==1) {
@@ -549,9 +529,9 @@ public class Pannello extends JPanel {
 				ex.printStackTrace();
 			}
 		}
-		
+
 		System.out.println(as);
-		
+
 	}
 
 	public static void ripristina(ArrayList<Pedina> lista, int colore) {
@@ -569,16 +549,24 @@ public class Pannello extends JPanel {
 		}
 	}
 
+	public static int focusScelta(int x, int y) {
+		if(x>50 && x< 70 && y>552 && y<572) return 1;
+		if(x>95 && x< 115 && y>570 && y<590) return 2;
+		if(x>95 && x< 115 && y>630 && y<650) return 3;
+
+		return 0;
+	}
+
 	@Override
 	public void paint(Graphics g) {
 		super.paint(g);
 
 		g.drawImage(scacchiera,0,0,700,700,this);
 
-		g.drawImage(damaBianca, bottone.getX(), bottone.getY(), bottone.getLarghezza(), bottone.getAltezza(), this);
+		g.drawImage(gipfBianco, bottone.getX(), bottone.getY(), bottone.getLarghezza(), bottone.getAltezza(), this);
 
-		g.drawImage(damaNera, bottoneScelta.getX(), bottoneScelta.getY(), bottoneScelta.getLarghezza(), bottoneScelta.getAltezza(), this);
-		
+		g.drawImage(gipfNero, bottoneScelta.getX(), bottoneScelta.getY(), bottoneScelta.getLarghezza(), bottoneScelta.getAltezza(), this);
+
 		int countPedine = 0;
 		for(Pedina pedina : pedineNere) {
 			if(pedina.getX()==0 && pedina.getY()==0) {
@@ -625,16 +613,17 @@ public class Pannello extends JPanel {
 			g.drawImage(puntoRosso, sceltadlv.getX()*60-20+110, sceltadlv.getY()*35-20+70, 40, 40, this);			
 		}
 
+		if(deviScegliere) {
+			g.drawImage(Iscelta, 20, 540, 120, 120, this);
+		}
+
 		g.drawString(""+scelta,10,30);
 
 		g.drawString(""+x+" "+y, 10, 10); 
-		
-		g.drawImage(Iscelta, 20, 540, 120, 120, this);
-
 
 	}
 
-	
+
 
 
 
