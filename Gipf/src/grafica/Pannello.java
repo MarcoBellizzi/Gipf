@@ -30,7 +30,7 @@ public class Pannello extends JPanel {
 	static int x = 0;
 	static int y = 0;
 
-	ArrayList<Punto> listaPunti;
+	ArrayList<Punto> listaPunti;    // da rimuovere
 	ArrayList<Start> listaSpot;
 	ArrayList<Pedina> pedineNere;
 	ArrayList<Pedina> pedineBianche;
@@ -38,12 +38,17 @@ public class Pannello extends JPanel {
 
 	static int catturateBianche;
 	static int catturateNere;
+	
+	static int scelta = 0;
+	static boolean deviScegliere = false;
 
 	boolean scelto;
 
 	Bottone bottone;
+	
+	Bottone bottoneScelta;
 
-	Image scacchiera, damaNera, damaBianca, puntoRosso, puntoVerde;
+	Image scacchiera, damaNera, damaBianca, puntoRosso, puntoVerde, Iscelta;
 
 	public static Handler handler;  
 
@@ -64,12 +69,24 @@ public class Pannello extends JPanel {
 			damaBianca = ImageIO.read(new File("src/grafica/damaBianca.png"));
 			puntoRosso = ImageIO.read(new File("src/grafica/puntoRosso.png"));
 			puntoVerde = ImageIO.read(new File("src/grafica/puntoVerde.png"));
+			Iscelta = ImageIO.read(new File("src/grafica/scelta.png"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		bottone = new Bottone(200,10,80,80);
+		bottoneScelta = new Bottone(300,10,80,80);
 	}
 
+	
+	public static int focusScelta(int x, int y) {
+		if(x>50 && x< 70 && y>552 && y<572) return 1;
+		if(x>95 && x< 115 && y>570 && y<590) return 2;
+		if(x>95 && x< 115 && y>630 && y<650) return 3;
+
+		return 0;
+	}
+	
+	
 	public void initEH() {
 		this.addMouseMotionListener(new MouseMotionAdapter() {
 
@@ -133,6 +150,12 @@ public class Pannello extends JPanel {
 				if(bottone.isFocus(x, y)) {
 					scegli();
 				}
+				
+				if(bottoneScelta.isFocus(x, y)) {
+					scegli2();
+				}
+				
+				scelta = focusScelta(x,y);
 
 			}
 
@@ -216,6 +239,8 @@ public class Pannello extends JPanel {
 			ASPMapper.getInstance().registerClass(Pedina.class);
 			ASPMapper.getInstance().registerClass(Finale.class);
 			ASPMapper.getInstance().registerClass(Catturate.class);
+			ASPMapper.getInstance().registerClass(Direzione.class);
+			ASPMapper.getInstance().registerClass(Nuova.class);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -254,17 +279,16 @@ public class Pannello extends JPanel {
 		handler.addProgram(facts);
 
 		InputProgram encoding = new ASPInputProgram();
-		encoding.addFilesPath("codice/iniziale");
+		encoding.addFilesPath("codice/bianco");
 		handler.addProgram(encoding);
 
-		Output o =  handler.startSync();    // esegue il dlv
+		Output o =  handler.startSync(); 
 
 		AnswerSets answers = (AnswerSets) o;
 
 		sceltadlv = new Scelgo(100,100,10);  // se non c'è nessuno scelgo
 		int as = 0;
 		int oggetti = 0;
-		int scelgo = 0;
 		for(AnswerSet a : answers.getAnswersets()){
 			as++;
 			try {
@@ -288,7 +312,6 @@ public class Pannello extends JPanel {
 
 					if(obj instanceof Scelgo) {
 						System.out.println((Scelgo)obj);
-						scelgo++;
 						sceltadlv = (Scelgo) obj;
 					}
 
@@ -326,7 +349,6 @@ public class Pannello extends JPanel {
 
 		System.out.println("answersets : " + as);
 		System.out.println("atomi : " + oggetti);
-		System.out.println("scelte : " + scelgo);
 		System.out.println("coordinate della scelta : " + sceltadlv.getX() + "  " + sceltadlv.getY());
 
 	}
@@ -338,6 +360,7 @@ public class Pannello extends JPanel {
 
 		try {
 			facts.addObjectInput(sceltadlv);
+			
 			for(Pedina pedina : pedineNere) {
 				facts.addObjectInput(pedina);
 			}
@@ -351,16 +374,134 @@ public class Pannello extends JPanel {
 		handler.addProgram(facts);
 
 		InputProgram encoding = new ASPInputProgram();
-		encoding.addFilesPath("codice/prova");
+		encoding.addFilesPath("codice/nero");
 		handler.addProgram(encoding);
 
-		Output o =  handler.startSync();    // esegue il dlv
+		Output o =  handler.startSync();
 
 		AnswerSets answers = (AnswerSets) o;
 
+		deviScegliere = false;
+		
+		for(AnswerSet p : answers.getAnswersets()) {
+			try {
+
+				
+				for(Object object : p.getAtoms()) {
+					if(object instanceof Direzione) {    // eccezione
+						deviScegliere = true;
+					}
+					if(object instanceof Catturate) {
+						if(((Catturate)object).getColore() == 0 ) {
+							catturateNere += ((Catturate) object).getNumero();
+						}
+						else {
+							catturateBianche += ((Catturate) object).getNumero();
+						}
+					}
+				}
+				
+				
+				ripristina(pedineNere,0);
+				ripristina(pedineBianche,1);
+				
+				if(deviScegliere) {
+					for(Object op : p.getAtoms()) {
+						if(op instanceof Nuova) {
+							Nuova pedina = (Nuova) op;
+							if(pedina.getColore()==1) {
+								for(Pedina bianca : pedineBianche) {
+									if(bianca.getX()==8 && bianca.getY()==0) {
+										bianca.setX(pedina.getX());
+										bianca.setY(pedina.getY());
+										break;
+									}
+								}
+							}
+							else {
+								for(Pedina nera : pedineNere) {
+									if(nera.getX()==0 && nera.getY()==0) {
+										nera.setX(pedina.getX());
+										nera.setY(pedina.getY());
+										break;
+									}
+								}
+							}
+						}
+					}
+					System.out.println("scegli la direzione");
+				}
+				else {
+					for(Object op : p.getAtoms()) {
+						if(op instanceof Finale) {
+							Finale pedina = (Finale) op;
+							if(pedina.getColore()==1) {
+								for(Pedina bianca : pedineBianche) {
+									if(bianca.getX()==8 && bianca.getY()==0) {
+										bianca.setX(pedina.getX());
+										bianca.setY(pedina.getY());
+										break;
+									}
+								}
+							}
+							else {
+								for(Pedina nera : pedineNere) {
+									if(nera.getX()==0 && nera.getY()==0) {
+										nera.setX(pedina.getX());
+										nera.setY(pedina.getY());
+										break;
+									}
+								}
+							}
+						}
+					}
+				}
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	
+	
+	public void scegli2() {
+		
+		
+		handler.removeAll();
+
+		InputProgram facts = new ASPInputProgram();
+
+		try {
+			facts.addObjectInput(new Direzione(scelta));
+			
+			for(Pedina pedina : pedineNere) {
+				facts.addObjectInput(pedina);
+			}
+			for(Pedina pedina : pedineBianche) {
+				facts.addObjectInput(pedina);
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+
+		handler.addProgram(facts);
+
+		InputProgram encoding = new ASPInputProgram();
+		encoding.addFilesPath("codice/nero2");
+		handler.addProgram(encoding);
+
+		Output o =  handler.startSync(); 
+
+		AnswerSets answers = (AnswerSets) o;
+
+		int as = 0;
+		
 		for(AnswerSet a : answers.getAnswersets()) {
 			try {
 
+				as++;
+				
 				for(Object obj : a.getAtoms()) {
 					if(obj instanceof Catturate) {
 						if(((Catturate)obj).getColore() == 0 ) {
@@ -376,9 +517,12 @@ public class Pannello extends JPanel {
 				ripristina(pedineBianche,1);
 
 
+				System.out.println("ci sono");
+				
 				for(Object obj : a.getAtoms()) {
 					if(obj instanceof Finale) {
 						Finale pedina = (Finale) obj;
+						
 						System.out.println(pedina);
 
 						if(pedina.getColore()==1) {
@@ -405,7 +549,9 @@ public class Pannello extends JPanel {
 				ex.printStackTrace();
 			}
 		}
-
+		
+		System.out.println(as);
+		
 	}
 
 	public static void ripristina(ArrayList<Pedina> lista, int colore) {
@@ -431,6 +577,8 @@ public class Pannello extends JPanel {
 
 		g.drawImage(damaBianca, bottone.getX(), bottone.getY(), bottone.getLarghezza(), bottone.getAltezza(), this);
 
+		g.drawImage(damaNera, bottoneScelta.getX(), bottoneScelta.getY(), bottoneScelta.getLarghezza(), bottoneScelta.getAltezza(), this);
+		
 		int countPedine = 0;
 		for(Pedina pedina : pedineNere) {
 			if(pedina.getX()==0 && pedina.getY()==0) {
@@ -477,12 +625,30 @@ public class Pannello extends JPanel {
 			g.drawImage(puntoRosso, sceltadlv.getX()*60-20+110, sceltadlv.getY()*35-20+70, 40, 40, this);			
 		}
 
+		g.drawString(""+scelta,10,30);
 
+		g.drawString(""+x+" "+y, 10, 10); 
+		
+		g.drawImage(Iscelta, 20, 540, 120, 120, this);
 
 
 	}
 
+	
+
+
+
+
+
 
 }
+
+
+
+
+
+
+
+
 
 

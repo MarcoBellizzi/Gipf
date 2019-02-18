@@ -1,0 +1,18 @@
+quattro(X,A,1,C) :- pedina(X,A,C), pedina(X,A+2,C), pedina(X,A+4,C), pedina(X,A+6,C). 
+via(X,A,1) :- quattro(X,A,1,C), direzione(1).
+via(X,B,1) :- pedina(X,B,C), via(X,A,1), B=A+2.
+via(X,B,1) :- pedina(X,B,C), via(X,A,1), B=A-2.
+
+quattro(X,Y,2,C) :- pedina(X,Y,C), pedina(X+1,Y-1,C), pedina(X+2,Y-2,C), pedina(X+3,Y-3,C).
+via(X,Y,2) :- quattro(X,Y,2,C), direzione(2).
+via(X,Y,2) :- pedina(X,Y,C), via(A,B,2), X=A+1, Y=B-1.
+via(X,Y,2) :- pedina(X,Y,C), via(A,B,2), X=A-1, Y=B+1.
+
+quattro(X,Y,3,C) :- pedina(X,Y,C), pedina(X-1,Y-1,C), pedina(X-2,Y-2,C), pedina(X-3,Y-3,C).
+via(X,Y,3) :- quattro(X,Y,3,C), direzione(3).
+via(X,Y,3) :- pedina(X,Y,C), via(A,B,3), X=A-1, Y=B-1.
+via(X,Y,3) :- pedina(X,Y,C), via(A,B,3), X=A+1, Y=B+1.
+
+finale(X,Y,C) :- pedina(X,Y,C), not via(X,Y,1), not via(X,Y,2), not via(X,Y,3).
+
+catturate(N,C) :- quattro(A,B,D,C), #count { X,Y : pedina(X,Y,1), via(X,Y,D) } = N.
