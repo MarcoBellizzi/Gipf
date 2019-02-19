@@ -3,67 +3,69 @@ scelgo(X,Y,A) | scelgo(X,Y,B) | no(X,Y) :- start(X,Y,A,B).
 :- not #count { X,Y : scelgo(X,Y,A) } = 1.
 
 
-pedina(X,Y,1) :- scelgo(X,Y,D). 
+pedina(X,Y,1,0) :- scelgo(X,Y,D). 
 
 
 connessa(X,Y,D) :- scelgo(X,Y,D).
 
 
-connessa(X,Y,1) :- connessa(X,B,1), pedina(X,Y,C), Y=B-2.
-nuova(X,B,C) :- connessa(X,Y,1), pedina(X,Y,C), B=Y-2.
+connessa(X,Y,1) :- connessa(X,B,1), pedina(X,Y,C,G), Y=B-2.
+nuova(X,B,C,G) :- connessa(X,Y,1), pedina(X,Y,C,G), B=Y-2.
 
-connessa(X,Y,2) :- connessa(A,B,2), pedina(X,Y,C), X=A+1, Y=B-1.
-nuova(A,B,C) :- connessa(X,Y,2), pedina(X,Y,C), A=X+1, B=Y-1.
+connessa(X,Y,2) :- connessa(A,B,2), pedina(X,Y,C,G), X=A+1, Y=B-1.
+nuova(A,B,C,G) :- connessa(X,Y,2), pedina(X,Y,C,G), A=X+1, B=Y-1.
 
-connessa(X,Y,3) :- connessa(A,B,3), pedina(X,Y,C), X=A+1, Y=B+1.
-nuova(A,B,C) :- connessa(X,Y,3), pedina(X,Y,C), A=X+1, B=Y+1.
+connessa(X,Y,3) :- connessa(A,B,3), pedina(X,Y,C,G), X=A+1, Y=B+1.
+nuova(A,B,C,G) :- connessa(X,Y,3), pedina(X,Y,C,G), A=X+1, B=Y+1.
 
-connessa(X,Y,4) :- connessa(X,B,4), pedina(X,Y,C), Y=B+2.
-nuova(X,B,C) :- connessa(X,Y,4), pedina(X,Y,C), B=Y+2.
+connessa(X,Y,4) :- connessa(X,B,4), pedina(X,Y,C,G), Y=B+2.
+nuova(X,B,C,G) :- connessa(X,Y,4), pedina(X,Y,C,G), B=Y+2.
 
-connessa(X,Y,5) :- connessa(A,B,5), pedina(X,Y,C), X=A-1, Y=B+1.
-nuova(A,B,C) :- connessa(X,Y,5), pedina(X,Y,C), A=X-1, B=Y+1.
+connessa(X,Y,5) :- connessa(A,B,5), pedina(X,Y,C,G), X=A-1, Y=B+1.
+nuova(A,B,C,G) :- connessa(X,Y,5), pedina(X,Y,C,G), A=X-1, B=Y+1.
 
-connessa(X,Y,6) :- connessa(A,B,6), pedina(X,Y,C), X=A-1, Y=B-1.
-nuova(A,B,C) :- connessa(X,Y,6), pedina(X,Y,C), A=X-1, B=Y-1.
-
-
-:- nuova(X,Y,C), start(X,Y,A,B).  % per il bordo
+connessa(X,Y,6) :- connessa(A,B,6), pedina(X,Y,C,G), X=A-1, Y=B-1.
+nuova(A,B,C,G) :- connessa(X,Y,6), pedina(X,Y,C,G), A=X-1, B=Y-1.
 
 
-nuova(X,Y,C) :- pedina(X,Y,C), scelgo(A,B,D), not connessa(X,Y,D).    % le pedine non spostate
+:- nuova(X,Y,C,G), start(X,Y,A,B).  % per il bordo
 
 
-q(X,A,1,C) :- nuova(X,A,C), nuova(X,A+2,C), nuova(X,A+4,C), nuova(X,A+6,C). 
-via(X,A,1,C) :- quattro(X,A,1,C).
-via(X,B,1,C) :- nuova(X,B,C), via(X,A,1,C), B=A+2.
-via(X,B,1,C) :- nuova(X,B,C), via(X,A,1,C), B=A-2.
+nuova(X,Y,C,G) :- pedina(X,Y,C,G), scelgo(A,B,D), not connessa(X,Y,D).    % le pedine non spostate
 
-q(X,Y,2,C) :- nuova(X,Y,C), nuova(X+1,Y-1,C), nuova(X+2,Y-2,C), nuova(X+3,Y-3,C).
-via(X,Y,2,C) :- quattro(X,Y,2,C).
-via(X,Y,2,C) :- nuova(X,Y,C), via(A,B,2,C), X=A+1, Y=B-1.
-via(X,Y,2,C) :- nuova(X,Y,C), via(A,B,2,C), X=A-1, Y=B+1.
 
-q(X,Y,3,C) :- nuova(X,Y,C), nuova(X-1,Y-1,C), nuova(X-2,Y-2,C), nuova(X-3,Y-3,C).
-via(X,Y,3,C) :- quattro(X,Y,3,C).
-via(X,Y,3,C) :- nuova(X,Y,C), via(A,B,3,C), X=A-1, Y=B-1.
-via(X,Y,3,C) :- nuova(X,Y,C), via(A,B,3,C), X=A+1, Y=B+1.
+q(X,A,1,C) :- nuova(X,A,C,G), nuova(X,A+2,C,F), nuova(X,A+4,C,H), nuova(X,A+6,C,I). 
+via(X,A,1,C,G) :- quattro(X,A,1,C), nuova(X,A,C,G).
+via(X,B,1,C,G) :- nuova(X,B,C,G), via(X,A,1,C,F), B=A+2.
+via(X,B,1,C,G) :- nuova(X,B,C,G), via(X,A,1,C,F), B=A-2.
+
+q(X,Y,2,C) :- nuova(X,Y,C,G), nuova(X+1,Y-1,C,F), nuova(X+2,Y-2,C,H), nuova(X+3,Y-3,C,I).
+via(X,Y,2,C,G) :- quattro(X,Y,2,C),nuova(X,Y,C,G).
+via(X,Y,2,C,G) :- nuova(X,Y,C,G), via(A,B,2,C,F), X=A+1, Y=B-1.
+via(X,Y,2,C,G) :- nuova(X,Y,C,G), via(A,B,2,C,F), X=A-1, Y=B+1.
+
+q(X,Y,3,C) :- nuova(X,Y,C,G), nuova(X-1,Y-1,C,F), nuova(X-2,Y-2,C,H), nuova(X-3,Y-3,C,I).
+via(X,Y,3,C,G) :- quattro(X,Y,3,C), nuova(X,Y,C,G).
+via(X,Y,3,C,G) :- nuova(X,Y,C,G), via(A,B,3,C,F), X=A-1, Y=B-1.
+via(X,Y,3,C,G) :- nuova(X,Y,C,G), via(A,B,3,C,F), X=A+1, Y=B+1.
 
 
 quattro(X,Y,D,C) | noquattro(X,Y,D,C) :- q(X,Y,D,C).
 
-:- via(X,Y,D,C), via(X,Y,E,C), D!=E.
+:- via(X,Y,D,C,G), via(X,Y,E,C,F), D!=E.
 
 :~ q(X,Y,D,1), noquattro(X,Y,D,1). [1@2]
 
 :~ noquattro(X,Y,D,C). [1@1]
 
+finale(X,Y,C,G) :- nuova(X,Y,C,G), not via(X,Y,1,C,G), not via(X,Y,2,C,G), not via(X,Y,3,C,G).
+finale(X,Y,C,1):- via(X,Y,D,C,1), quattro(Z,W,D,C).
 
-finale(X,Y,C) :- nuova(X,Y,C), not via(X,Y,1,C), not via(X,Y,2,C), not via(X,Y,3,C).
 
-catturate(N,1) :- quattro(A,B,D,0), #count { X,Y : via(X,Y,D,1) } = N. 
+catturate(N,1) :- quattro(A,B,D,0), #count { X,Y : via(X,Y,D,1,G) } = N. 
 
-catturate(N,0) :- quattro(A,B,D,1), #count { X,Y : via(X,Y,D,0) } = N.
+catturate(N,0) :- quattro(A,B,D,1), #count { X,Y : via(X,Y,D,0,G) } = N.
+
 
 
 

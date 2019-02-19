@@ -12,19 +12,19 @@ public class Finale {
 	@Param(1)
 	int y;
 	
-	/*
-	 * 0 = nera
-	 * 1 = bianca
-	 */
 	@Param(2)
 	int colore;
+	
+	@Param(3)
+	int gipf;
 
 	public Finale() {}
 	
-	public Finale(int x, int y, int colore) {
+	public Finale(int x, int y, int colore, int gipf) {
 		this.x = x;
 		this.y = y;
 		this.colore = colore;
+		this.gipf = gipf;
 	}
 	
 	public int getX() { return x; }
@@ -32,16 +32,20 @@ public class Finale {
 	public int getY() { return y; }
 	
 	public int getColore() { return colore; }
+
+	public int getGipf() { return gipf; }
 	
 	public void setX(int x) { this.x = x; }
 	
 	public void setY(int y) { this.y = y; }
 	
 	public void setColore(int colore) { this.colore = colore; }
+	
+	public void setGipf(int gipf) { this.gipf = gipf; }
 
 	@Override
 	public String toString() {
-		return "Finale [x=" + x + ", y=" + y + ", colore=" + colore + "]";
+		return "Finale [x=" + x + ", y=" + y + ", colore=" + colore + ", gipf=" + gipf + "]";
 	}
 	
 	

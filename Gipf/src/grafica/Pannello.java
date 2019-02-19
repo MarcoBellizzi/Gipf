@@ -47,6 +47,8 @@ public class Pannello extends JPanel {
 	static int catturateBianche;
 	static int catturateNere;
 
+	boolean gipfBianchi = true;
+
 	Bottone bottone;
 	Bottone bottoneScelta;
 
@@ -82,8 +84,8 @@ public class Pannello extends JPanel {
 		sceltadlv = new Scelgo(100,100,10);
 		catturateBianche = 0;
 		catturateNere = 0;
+		
 	}
-
 
 	public void initEH() {
 		this.addMouseMotionListener(new MouseMotionAdapter() {
@@ -146,12 +148,12 @@ public class Pannello extends JPanel {
 				}
 
 				if(bottone.isFocus(x, y)) {
-					muoviBianco();
+					deviScegliere = false;
+					muoviNero2();
 				}
 
 				if(bottoneScelta.isFocus(x, y)) {
-					deviScegliere = false;
-					muoviNero2();
+					muoviBianco();
 				}
 
 				scelta = focusScelta(x,y);
@@ -209,13 +211,19 @@ public class Pannello extends JPanel {
 
 		pedineNere = new ArrayList<Pedina>();
 		for(int i=0; i<12; i++) {
-			pedineNere.add(new Pedina(0,0,0));
+			pedineNere.add(new Pedina(0,0,0,0));
 		}
+		pedineNere.add(new Pedina(4,2,0,1));
+		pedineNere.add(new Pedina(7,11,0,1));
+		pedineNere.add(new Pedina(1,11,0,1));
 
 		pedineBianche = new ArrayList<Pedina>(); 
 		for(int i=0; i<12; i++) {
-			pedineBianche.add(new Pedina(8,0,1));
+			pedineBianche.add(new Pedina(8,0,1,0));
 		}
+		pedineBianche.add(new Pedina(1,5,1,1));
+		pedineBianche.add(new Pedina(7,5,1,1));
+		pedineBianche.add(new Pedina(4,14,1,1));
 
 		suggerimento = new Start[2];
 		for(int i=0; i<2; i++) {
@@ -242,6 +250,11 @@ public class Pannello extends JPanel {
 
 	}
 
+	
+	
+	
+	
+	
 	public void muoviBianco() {
 		handler.removeAll();
 
@@ -315,6 +328,7 @@ public class Pannello extends JPanel {
 								if(bianca.getX()==8 && bianca.getY()==0) {
 									bianca.setX(pedina.getX());
 									bianca.setY(pedina.getY());
+									bianca.setGipf(pedina.getGipf());
 									break;
 								}
 							}
@@ -324,6 +338,7 @@ public class Pannello extends JPanel {
 								if(nera.getX()==0 && nera.getY()==0) {
 									nera.setX(pedina.getX());
 									nera.setY(pedina.getY());
+									nera.setGipf(pedina.getGipf());
 									break;
 								}
 							}
@@ -400,6 +415,7 @@ public class Pannello extends JPanel {
 									if(bianca.getX()==8 && bianca.getY()==0) {
 										bianca.setX(pedina.getX());
 										bianca.setY(pedina.getY());
+										bianca.setGipf(pedina.getGipf());
 										break;
 									}
 								}
@@ -409,6 +425,7 @@ public class Pannello extends JPanel {
 									if(nera.getX()==0 && nera.getY()==0) {
 										nera.setX(pedina.getX());
 										nera.setY(pedina.getY());
+										nera.setGipf(pedina.getGipf());
 										break;
 									}
 								}
@@ -426,6 +443,7 @@ public class Pannello extends JPanel {
 									if(bianca.getX()==8 && bianca.getY()==0) {
 										bianca.setX(pedina.getX());
 										bianca.setY(pedina.getY());
+										bianca.setGipf(pedina.getGipf());
 										break;
 									}
 								}
@@ -435,6 +453,7 @@ public class Pannello extends JPanel {
 									if(nera.getX()==0 && nera.getY()==0) {
 										nera.setX(pedina.getX());
 										nera.setY(pedina.getY());
+										nera.setGipf(pedina.getGipf());
 										break;
 									}
 								}
@@ -447,9 +466,16 @@ public class Pannello extends JPanel {
 				e.printStackTrace();
 			}
 		}
+
+		gipfBianchi = false;
+		for(Pedina pedina : pedineBianche) {
+			if(pedina.getGipf()==1)
+				gipfBianchi = true;
+		}
+
+
+
 	}
-
-
 
 	public void muoviNero2() {
 		handler.removeAll();
@@ -510,6 +536,7 @@ public class Pannello extends JPanel {
 								if(bianca.getX()==8 && bianca.getY()==0) {
 									bianca.setX(pedina.getX());
 									bianca.setY(pedina.getY());
+									bianca.setGipf(pedina.getGipf());
 									break;
 								}
 							}
@@ -519,6 +546,7 @@ public class Pannello extends JPanel {
 								if(nera.getX()==0 && nera.getY()==0) {
 									nera.setX(pedina.getX());
 									nera.setY(pedina.getY());
+									nera.setGipf(pedina.getGipf());
 									break;
 								}
 							}
@@ -534,17 +562,21 @@ public class Pannello extends JPanel {
 
 	}
 
+	
+	
+	
+	
 	public static void ripristina(ArrayList<Pedina> lista, int colore) {
 		lista.clear();
 
 		if(colore==0) {
-			for(int i=0; i<12-catturateNere; i++) {
-				lista.add(new Pedina(0,0,0));
+			for(int i=0; i<15-catturateNere; i++) {
+				lista.add(new Pedina(0,0,0,0));
 			}
 		}
 		else {
-			for(int i=0; i<12-catturateBianche; i++) {
-				lista.add(new Pedina(8,0,1));
+			for(int i=0; i<15-catturateBianche; i++) {
+				lista.add(new Pedina(8,0,1,0));
 			}
 		}
 	}
@@ -557,69 +589,94 @@ public class Pannello extends JPanel {
 		return 0;
 	}
 
+	
+	
 	@Override
 	public void paint(Graphics g) {
 		super.paint(g);
 
-		g.drawImage(scacchiera,0,0,700,700,this);
 
-		g.drawImage(gipfBianco, bottone.getX(), bottone.getY(), bottone.getLarghezza(), bottone.getAltezza(), this);
+		if(gipfBianchi) {
+			g.drawImage(scacchiera,0,0,700,700,this);
 
-		g.drawImage(gipfNero, bottoneScelta.getX(), bottoneScelta.getY(), bottoneScelta.getLarghezza(), bottoneScelta.getAltezza(), this);
+			g.drawImage(damaNera, bottone.getX(), bottone.getY(), bottone.getLarghezza(), bottone.getAltezza(), this);
 
-		int countPedine = 0;
-		for(Pedina pedina : pedineNere) {
-			if(pedina.getX()==0 && pedina.getY()==0) {
-				countPedine++;
-			}
-			g.drawImage(damaNera, pedina.getX()*60-20+110, pedina.getY()*35-20+70, 40, 40, this);
-		}
-		g.drawString(""+countPedine, 140, 80);
+			g.drawImage(damaBianca, bottoneScelta.getX(), bottoneScelta.getY(), bottoneScelta.getLarghezza(), bottoneScelta.getAltezza(), this);
 
-		int countBianche = 0;
-		for(Pedina pedina : pedineBianche) {
-			if(pedina.getX()==8 && pedina.getY()==0) {
-				countBianche++;
-			}
-			g.drawImage(damaBianca, pedina.getX()*60-20+110, pedina.getY()*35-20+70, 40, 40, this);
-		}
-		g.drawString(""+countBianche, 540, 80);
-
-		for(Start punto : listaSpot) {
-			if(punto.isFocus(x, y)) {
-				g.drawImage(damaNera, punto.getX()*60-20+110, punto.getY()*35-20+70, 40, 40, this);  // fare funzione
-
-				for(int i=0; i<2; i++) {
-					int dir = punto.getDirezione1();
-					if(i==1) dir = punto.getDirezione2();
-
-					if(dir == 1)  g.drawImage(puntoVerde, punto.getX()*60-20+110, punto.getY()*35-20+70-70, 40, 40, this);
-					if(dir == 2)  g.drawImage(puntoVerde, punto.getX()*60-20+110+60, punto.getY()*35-20+70-35, 40, 40, this);
-					if(dir == 3)  g.drawImage(puntoVerde, punto.getX()*60-20+110+60, punto.getY()*35-20+70+35, 40, 40, this);
-					if(dir == 4)  g.drawImage(puntoVerde, punto.getX()*60-20+110, punto.getY()*35-20+70+70, 40, 40, this);
-					if(dir == 5)  g.drawImage(puntoVerde, punto.getX()*60-20+110-60, punto.getY()*35-20+70+35, 40, 40, this);
-					if(dir == 6)  g.drawImage(puntoVerde, punto.getX()*60-20+110-60, punto.getY()*35-20+70-35, 40, 40, this);
+			int countPedine = 0;
+			for(Pedina pedina : pedineNere) {
+				if(pedina.getX()==0 && pedina.getY()==0) {
+					countPedine++;
+				}
+				if(pedina.getGipf()==0) {
+					g.drawImage(damaNera, pedina.getX()*60-20+110, pedina.getY()*35-20+70, 40, 40, this);
+				}
+				else {
+					g.drawImage(gipfNero, pedina.getX()*60-20+110, pedina.getY()*35-20+70, 40, 40, this);				
 				}
 			}
-		}
+			g.drawString(""+countPedine, 140, 80);
 
-		if(scelto) {
-			for(int i=0; i<2; i++) {
-				g.drawImage(puntoVerde, suggerimento[i].getX()*60-20+110, suggerimento[i].getY()*35-20+70, 40, 40, this);
-				g.drawImage(damaNera, sceltadlv.getX()*60-20+110, sceltadlv.getY()*35-20+70, 40, 40, this);			
+			int countBianche = 0;
+			for(Pedina pedina : pedineBianche) {
+				if(pedina.getX()==8 && pedina.getY()==0) {
+					countBianche++;
+				}
+				if(pedina.getGipf()==0) {
+					g.drawImage(damaBianca, pedina.getX()*60-20+110, pedina.getY()*35-20+70, 40, 40, this);		
+				}
+				else {				
+					g.drawImage(gipfBianco, pedina.getX()*60-20+110, pedina.getY()*35-20+70, 40, 40, this);
+				}
 			}
+			g.drawString(""+countBianche, 540, 80);
+
+			for(Start punto : listaSpot) {
+				if(punto.isFocus(x, y)) {
+					g.drawImage(damaNera, punto.getX()*60-20+110, punto.getY()*35-20+70, 40, 40, this);  // fare funzione
+
+					for(int i=0; i<2; i++) {
+						int dir = punto.getDirezione1();
+						if(i==1) dir = punto.getDirezione2();
+
+						if(dir == 1)  g.drawImage(puntoVerde, punto.getX()*60-20+110, punto.getY()*35-20+70-70, 40, 40, this);
+						if(dir == 2)  g.drawImage(puntoVerde, punto.getX()*60-20+110+60, punto.getY()*35-20+70-35, 40, 40, this);
+						if(dir == 3)  g.drawImage(puntoVerde, punto.getX()*60-20+110+60, punto.getY()*35-20+70+35, 40, 40, this);
+						if(dir == 4)  g.drawImage(puntoVerde, punto.getX()*60-20+110, punto.getY()*35-20+70+70, 40, 40, this);
+						if(dir == 5)  g.drawImage(puntoVerde, punto.getX()*60-20+110-60, punto.getY()*35-20+70+35, 40, 40, this);
+						if(dir == 6)  g.drawImage(puntoVerde, punto.getX()*60-20+110-60, punto.getY()*35-20+70-35, 40, 40, this);
+					}
+				}
+			}
+
+			if(scelto) {
+				for(int i=0; i<2; i++) {
+					g.drawImage(puntoVerde, suggerimento[i].getX()*60-20+110, suggerimento[i].getY()*35-20+70, 40, 40, this);
+					g.drawImage(damaNera, sceltadlv.getX()*60-20+110, sceltadlv.getY()*35-20+70, 40, 40, this);			
+				}
+			}
+			else {
+				g.drawImage(puntoRosso, sceltadlv.getX()*60-20+110, sceltadlv.getY()*35-20+70, 40, 40, this);			
+			}
+
+			if(deviScegliere) {
+				g.drawImage(Iscelta, 20, 540, 120, 120, this);
+			}
+
+			g.drawString(""+scelta,10,30);
+
+			g.drawString(""+x+" "+y, 10, 10); 
+
+
+
 		}
 		else {
-			g.drawImage(puntoRosso, sceltadlv.getX()*60-20+110, sceltadlv.getY()*35-20+70, 40, 40, this);			
+			g.drawString("HAI VINTO", 300, 300);
 		}
 
-		if(deviScegliere) {
-			g.drawImage(Iscelta, 20, 540, 120, 120, this);
-		}
 
-		g.drawString(""+scelta,10,30);
 
-		g.drawString(""+x+" "+y, 10, 10); 
+
 
 	}
 

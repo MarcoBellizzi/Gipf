@@ -1,21 +1,22 @@
-quattro(X,A,1,C) :- pedina(X,A,C), pedina(X,A+2,C), pedina(X,A+4,C), pedina(X,A+6,C). 
-via(X,A,1,C) :- quattro(X,A,1,C), direzione(1).
-via(X,B,1,C) :- pedina(X,B,C), via(X,A,1,C), B=A+2.
-via(X,B,1,C) :- pedina(X,B,C), via(X,A,1,C), B=A-2.
+quattro(X,A,1,C) :- pedina(X,A,C,G), pedina(X,A+2,C,F), pedina(X,A+4,C,H), pedina(X,A+6,C,I). 
+via(X,A,1,C,G) :- quattro(X,A,1,C), pedina(X,A,C,G), direzione(1).
+via(X,B,1,C,G) :- pedina(X,B,C,G), via(X,A,1,C,F), B=A+2.
+via(X,B,1,C,G) :- pedina(X,B,C,G), via(X,A,1,C,F), B=A-2.
 
-quattro(X,Y,2,C) :- pedina(X,Y,C), pedina(X+1,Y-1,C), pedina(X+2,Y-2,C), pedina(X+3,Y-3,C).
-via(X,Y,2,C) :- quattro(X,Y,2,C), direzione(2).
-via(X,Y,2,C) :- pedina(X,Y,C), via(A,B,2,C), X=A+1, Y=B-1.
-via(X,Y,2,C) :- pedina(X,Y,C), via(A,B,2,C), X=A-1, Y=B+1.
+quattro(X,Y,2,C) :- pedina(X,Y,C,G), pedina(X+1,Y-1,C,F), pedina(X+2,Y-2,C,H), pedina(X+3,Y-3,C,I).
+via(X,Y,2,C,G) :- quattro(X,Y,2,C), pedina(X,Y,C,G), direzione(2).
+via(X,Y,2,C,G) :- pedina(X,Y,C,G), via(A,B,2,C,F), X=A+1, Y=B-1.
+via(X,Y,2,C,G) :- pedina(X,Y,C,G), via(A,B,2,C,F), X=A-1, Y=B+1.
 
-quattro(X,Y,3,C) :- pedina(X,Y,C), pedina(X-1,Y-1,C), pedina(X-2,Y-2,C), pedina(X-3,Y-3,C).
-via(X,Y,3,C) :- quattro(X,Y,3,C), direzione(3).
-via(X,Y,3,C) :- pedina(X,Y,C), via(A,B,3,C), X=A-1, Y=B-1.
-via(X,Y,3,C) :- pedina(X,Y,C), via(A,B,3,C), X=A+1, Y=B+1.
+quattro(X,Y,3,C) :- pedina(X,Y,C,G), pedina(X-1,Y-1,C,F), pedina(X-2,Y-2,C,H), pedina(X-3,Y-3,C,I).
+via(X,Y,3,C,G) :- quattro(X,Y,3,C), pedina(X,Y,C,G), direzione(3).
+via(X,Y,3,C,G) :- pedina(X,Y,C,G), via(A,B,3,C,F), X=A-1, Y=B-1.
+via(X,Y,3,C,G) :- pedina(X,Y,C,G), via(A,B,3,C,F), X=A+1, Y=B+1.
 
-finale(X,Y,C) :- pedina(X,Y,C), not via(X,Y,1,C), not via(X,Y,2,C), not via(X,Y,3,C).
+finale(X,Y,C,G) :- pedina(X,Y,C,G), not via(X,Y,1,C,G), not via(X,Y,2,C,G), not via(X,Y,3,C,G).
+finale(X,Y,0,1):- via(X,Y,D,0,1).
 
+catturate(N,1) :- quattro(A,B,D,0), #count { X,Y : via(X,Y,D,1,G) } = N. 
 
-catturate(N,1) :- quattro(A,B,D,0), #count { X,Y : via(X,Y,D,1) } = N. 
+catturate(N,0) :- quattro(A,B,D,1), #count { X,Y : via(X,Y,D,0,G) } = N. 
 
-catturate(N,0) :- quattro(A,B,D,1), #count { X,Y : via(X,Y,D,0) } = N. 
