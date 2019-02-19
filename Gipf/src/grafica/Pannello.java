@@ -30,9 +30,7 @@ public class Pannello extends JPanel {
 	static int x;   // muose
 	static int y;
 
-	static Handler handler;  
-
-	ArrayList<Start> listaSpot;
+	ArrayList<Start> listaStart;
 	ArrayList<Pedina> pedineNere;
 	ArrayList<Pedina> pedineBianche;
 	Start[] suggerimento;     // per i suggerimenti grafici
@@ -47,20 +45,45 @@ public class Pannello extends JPanel {
 	static int catturateBianche;
 	static int catturateNere;
 
-	boolean gipfBianchi = true;
+	boolean almenoUnGipfBianco;
+	boolean almenoUnGipfNero;
+	boolean finitePedineBianche;
+	boolean finitePedineNere;
+	boolean vintoBianco;
+	boolean vintoNero;
 
-	Bottone bottone;
-	Bottone bottoneScelta;
+	static Handler handler;  
 
+	Gestore gestoreTurni;
+	
 	Image scacchiera, damaNera, damaBianca, puntoRosso, puntoVerde, Iscelta, gipfNero, gipfBianco;
 
 	public Pannello() {
+		initGame();
 		initGUI();
 		initEH();
 		initListe();
 		initDlv();
 	}
 
+	public void initGame() {
+		x = 0;
+		y = 0;
+		scelta = 0;
+		sceltadlv = new Scelgo(100,100,10);
+		deviScegliere = false;
+		catturateBianche = 0;
+		catturateNere = 0;
+		almenoUnGipfBianco = true;
+		almenoUnGipfNero = true;
+		finitePedineBianche = false;
+		finitePedineNere = false;
+		vintoBianco = false;
+		vintoNero = false;
+		gestoreTurni = new Gestore(this);
+		gestoreTurni.start();
+	}
+	
 	public void initGUI() {
 		this.setFocusable(true);
 		try {
@@ -75,16 +98,6 @@ public class Pannello extends JPanel {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		bottone = new Bottone(200,10,80,80);
-		bottoneScelta = new Bottone(450,10,80,80);
-		scelta = 0;
-		deviScegliere = false;
-		x = 0;
-		y = 0;
-		sceltadlv = new Scelgo(100,100,10);
-		catturateBianche = 0;
-		catturateNere = 0;
-		
 	}
 
 	public void initEH() {
@@ -107,7 +120,7 @@ public class Pannello extends JPanel {
 
 				scelto = false;
 
-				for(Start punto : listaSpot) {
+				for(Start punto : listaStart) {
 					if(punto.isFocus(x, y)) {
 
 						int x = punto.getX();
@@ -123,7 +136,7 @@ public class Pannello extends JPanel {
 						if(dir1 == 6)  suggerimento[0].set(x-1,y-1,dir1);
 
 						if(dir1==dir2) {
-							suggerimento[1].set(100, 100, 1);  // non farlo vedere
+							suggerimento[1].set(100, 100, 1);       // non farlo vedere
 						}
 						else {
 							if(dir2 == 1) suggerimento[1].set(x,y-2,dir2);
@@ -147,16 +160,11 @@ public class Pannello extends JPanel {
 					}
 				}
 
-				if(bottone.isFocus(x, y)) {
+				scelta = focusScelta(x,y);
+				if(scelta != 0) {
 					deviScegliere = false;
 					muoviNero2();
 				}
-
-				if(bottoneScelta.isFocus(x, y)) {
-					muoviBianco();
-				}
-
-				scelta = focusScelta(x,y);
 
 			}
 
@@ -165,45 +173,45 @@ public class Pannello extends JPanel {
 	}
 
 	public void initListe() {
-		listaSpot = new ArrayList<Start>();
+		listaStart = new ArrayList<Start>();
 		for(int i=0; i<9; i++) {          
 			for(int j=0; j<17; j++) {
 				if(i%2 == j%2) {
 					if(i==0 && j==4) {
-						listaSpot.add(new Start(i,j,3));
+						listaStart.add(new Start(i,j,3));
 					}
 					else if(i+j==4 && i!=0 && i!=4) {
-						listaSpot.add(new Start(i,j,3, 4));
+						listaStart.add(new Start(i,j,3, 4));
 					}
 					else if(i==4 && j==0) {
-						listaSpot.add(new Start(i,j,4));
+						listaStart.add(new Start(i,j,4));
 					}
 					else if(i-j==4 && i!=4 && i!=8) {
-						listaSpot.add(new Start(i,j,4, 5));
+						listaStart.add(new Start(i,j,4, 5));
 					}
 					else if(i==8 && j==4) {
-						listaSpot.add(new Start(i,j,5));
+						listaStart.add(new Start(i,j,5));
 					}
 					else if(i==8 && j>5 && j<11) {
-						listaSpot.add(new Start(i,j,5, 6));
+						listaStart.add(new Start(i,j,5, 6));
 					}
 					else if(i==8 && j==12) {
-						listaSpot.add(new Start(i,j,6));
+						listaStart.add(new Start(i,j,6));
 					}
 					else if(i+j==20 && i!=4 && i!=8) {
-						listaSpot.add(new Start(i,j,6, 1));
+						listaStart.add(new Start(i,j,6, 1));
 					}
 					else if(i==4 && j==16) {
-						listaSpot.add(new Start(i,j,1));
+						listaStart.add(new Start(i,j,1));
 					}
 					else if(j-i==12 && i!=0 && i!=4) {
-						listaSpot.add(new Start(i,j,1, 2));
+						listaStart.add(new Start(i,j,1, 2));
 					}
 					else if(i==0 && j==12) {
-						listaSpot.add(new Start(i,j,2));
+						listaStart.add(new Start(i,j,2));
 					}
 					else if(i==0 && j>5 && j<11) {
-						listaSpot.add(new Start(i,j,2, 3));
+						listaStart.add(new Start(i,j,2, 3));
 					}
 				}					
 			}
@@ -252,14 +260,11 @@ public class Pannello extends JPanel {
 
 	
 	
-	
-	
-	
 	public void muoviBianco() {
 		handler.removeAll();
 
 		InputProgram facts = new ASPInputProgram();
-		for(Start punto : listaSpot) {
+		for(Start punto : listaStart) {
 			try {
 				facts.addObjectInput(punto);
 			} catch (Exception e) {
@@ -287,14 +292,11 @@ public class Pannello extends JPanel {
 		handler.addProgram(encoding);
 
 		Output o =  handler.startSync(); 
-
 		AnswerSets answers = (AnswerSets) o;
 
-		sceltadlv = new Scelgo(100,100,10);  // se non c'è nessuno scelgo
-		int as = 0;
-		int oggetti = 0;
+		sceltadlv = new Scelgo(100,100,10);      // se non c'è nessuno scelgo
+		
 		for(AnswerSet a : answers.getAnswersets()){
-			as++;
 			try {
 				for(Object obj : a.getAtoms()) {
 					if(obj instanceof Catturate) {
@@ -310,22 +312,20 @@ public class Pannello extends JPanel {
 				ripristina(pedineNere,0);
 				ripristina(pedineBianche,1);
 
-
 				for(Object obj : a.getAtoms()){
-					oggetti++;
 
 					if(obj instanceof Scelgo) {
-						System.out.println((Scelgo)obj);
 						sceltadlv = (Scelgo) obj;
 					}
 
 					if(obj instanceof Finale) {
 						Finale pedina = (Finale) obj;
-						System.out.println(pedina);
 
 						if(pedina.getColore()==1) {
+							finitePedineBianche = true;
 							for(Pedina bianca : pedineBianche) {
 								if(bianca.getX()==8 && bianca.getY()==0) {
+									finitePedineBianche = false;
 									bianca.setX(pedina.getX());
 									bianca.setY(pedina.getY());
 									bianca.setGipf(pedina.getGipf());
@@ -334,8 +334,10 @@ public class Pannello extends JPanel {
 							}
 						}
 						else {
+							finitePedineNere = true;
 							for(Pedina nera : pedineNere) {
 								if(nera.getX()==0 && nera.getY()==0) {
+									finitePedineNere = false;
 									nera.setX(pedina.getX());
 									nera.setY(pedina.getY());
 									nera.setGipf(pedina.getGipf());
@@ -345,16 +347,13 @@ public class Pannello extends JPanel {
 						}
 					}
 				}
+				
 			} catch (Exception e) {
 				e.printStackTrace();
 			} 
-
 		}
-
-		System.out.println("answersets : " + as);
-		System.out.println("atomi : " + oggetti);
-		System.out.println("coordinate della scelta : " + sceltadlv.getX() + "  " + sceltadlv.getY());
-
+		
+		verifica();
 	}
 
 	public void muoviNero() {
@@ -382,15 +381,13 @@ public class Pannello extends JPanel {
 		handler.addProgram(encoding);
 
 		Output o =  handler.startSync();
-
 		AnswerSets answers = (AnswerSets) o;
 
 		for(AnswerSet p : answers.getAnswersets()) {
 			try {
 
-
 				for(Object object : p.getAtoms()) {
-					if(object instanceof Direzione) {    // eccezione
+					if(object instanceof Direzione) {    // eccezione (più direzioni in cui si può mangiare)
 						deviScegliere = true;
 					}
 					if(object instanceof Catturate) {
@@ -411,8 +408,10 @@ public class Pannello extends JPanel {
 						if(op instanceof Nuova) {
 							Nuova pedina = (Nuova) op;
 							if(pedina.getColore()==1) {
+								finitePedineBianche = true;
 								for(Pedina bianca : pedineBianche) {
 									if(bianca.getX()==8 && bianca.getY()==0) {
+										finitePedineBianche = false;
 										bianca.setX(pedina.getX());
 										bianca.setY(pedina.getY());
 										bianca.setGipf(pedina.getGipf());
@@ -421,8 +420,10 @@ public class Pannello extends JPanel {
 								}
 							}
 							else {
+								finitePedineNere = true;
 								for(Pedina nera : pedineNere) {
 									if(nera.getX()==0 && nera.getY()==0) {
+										finitePedineNere = false;
 										nera.setX(pedina.getX());
 										nera.setY(pedina.getY());
 										nera.setGipf(pedina.getGipf());
@@ -439,8 +440,10 @@ public class Pannello extends JPanel {
 						if(op instanceof Finale) {
 							Finale pedina = (Finale) op;
 							if(pedina.getColore()==1) {
+								finitePedineBianche = true;
 								for(Pedina bianca : pedineBianche) {
 									if(bianca.getX()==8 && bianca.getY()==0) {
+										finitePedineBianche = false;
 										bianca.setX(pedina.getX());
 										bianca.setY(pedina.getY());
 										bianca.setGipf(pedina.getGipf());
@@ -449,8 +452,10 @@ public class Pannello extends JPanel {
 								}
 							}
 							else {
+								finitePedineNere = true;
 								for(Pedina nera : pedineNere) {
 									if(nera.getX()==0 && nera.getY()==0) {
+										finitePedineNere = false;
 										nera.setX(pedina.getX());
 										nera.setY(pedina.getY());
 										nera.setGipf(pedina.getGipf());
@@ -459,21 +464,16 @@ public class Pannello extends JPanel {
 								}
 							}
 						}
-					}
+					}	
+					gestoreTurni.rilascia();
 				}
-
+				
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
 
-		gipfBianchi = false;
-		for(Pedina pedina : pedineBianche) {
-			if(pedina.getGipf()==1)
-				gipfBianchi = true;
-		}
-
-
+		verifica();
 
 	}
 
@@ -504,10 +504,8 @@ public class Pannello extends JPanel {
 		Output o =  handler.startSync(); 
 		AnswerSets answers = (AnswerSets) o;
 
-		int as = 0;
 		for(AnswerSet a : answers.getAnswersets()) {
 			try {
-				as++;
 
 				for(Object obj : a.getAtoms()) {
 					if(obj instanceof Catturate) {
@@ -523,17 +521,15 @@ public class Pannello extends JPanel {
 				ripristina(pedineNere,0);
 				ripristina(pedineBianche,1);
 
-				System.out.println("ci sono");
-
 				for(Object obj : a.getAtoms()) {
 					if(obj instanceof Finale) {
 						Finale pedina = (Finale) obj;
 
-						System.out.println(pedina);
-
 						if(pedina.getColore()==1) {
+							finitePedineBianche = true;
 							for(Pedina bianca : pedineBianche) {
 								if(bianca.getX()==8 && bianca.getY()==0) {
+									finitePedineBianche = false;
 									bianca.setX(pedina.getX());
 									bianca.setY(pedina.getY());
 									bianca.setGipf(pedina.getGipf());
@@ -542,8 +538,10 @@ public class Pannello extends JPanel {
 							}
 						}
 						else {
+							finitePedineNere = true;
 							for(Pedina nera : pedineNere) {
 								if(nera.getX()==0 && nera.getY()==0) {
+									finitePedineNere = false;
 									nera.setX(pedina.getX());
 									nera.setY(pedina.getY());
 									nera.setGipf(pedina.getGipf());
@@ -557,14 +555,13 @@ public class Pannello extends JPanel {
 				ex.printStackTrace();
 			}
 		}
-
-		System.out.println(as);
+		
+		verifica();
+		
+		gestoreTurni.rilascia();
 
 	}
 
-	
-	
-	
 	
 	public static void ripristina(ArrayList<Pedina> lista, int colore) {
 		lista.clear();
@@ -590,18 +587,39 @@ public class Pannello extends JPanel {
 	}
 
 	
+	public void verifica() {
+		if(finitePedineBianche) {
+			vintoNero = true;
+		}
+		if(finitePedineNere) {
+			vintoBianco = true;
+		}
+		almenoUnGipfBianco = false;
+		for(Pedina pedina : pedineBianche) {
+			if(pedina.getGipf()==1)
+				almenoUnGipfBianco = true;
+		}
+		if(!almenoUnGipfBianco) {
+			vintoNero = true;
+		}
+		almenoUnGipfNero = false;
+		for(Pedina pedina : pedineNere) {
+			if(pedina.getGipf()==1)
+				almenoUnGipfNero = true;
+		}
+		if(!almenoUnGipfNero) {
+			vintoBianco = true;
+		}
+	}
+	
 	
 	@Override
 	public void paint(Graphics g) {
 		super.paint(g);
 
 
-		if(gipfBianchi) {
+		if(!vintoBianco && !vintoNero) {
 			g.drawImage(scacchiera,0,0,700,700,this);
-
-			g.drawImage(damaNera, bottone.getX(), bottone.getY(), bottone.getLarghezza(), bottone.getAltezza(), this);
-
-			g.drawImage(damaBianca, bottoneScelta.getX(), bottoneScelta.getY(), bottoneScelta.getLarghezza(), bottoneScelta.getAltezza(), this);
 
 			int countPedine = 0;
 			for(Pedina pedina : pedineNere) {
@@ -631,7 +649,7 @@ public class Pannello extends JPanel {
 			}
 			g.drawString(""+countBianche, 540, 80);
 
-			for(Start punto : listaSpot) {
+			for(Start punto : listaStart) {
 				if(punto.isFocus(x, y)) {
 					g.drawImage(damaNera, punto.getX()*60-20+110, punto.getY()*35-20+70, 40, 40, this);  // fare funzione
 
@@ -663,38 +681,19 @@ public class Pannello extends JPanel {
 				g.drawImage(Iscelta, 20, 540, 120, 120, this);
 			}
 
-			g.drawString(""+scelta,10,30);
-
-			g.drawString(""+x+" "+y, 10, 10); 
-
-
-
 		}
 		else {
-			g.drawString("HAI VINTO", 300, 300);
+			if(vintoNero) {
+				g.drawString("HAI VINTO", 300, 300);				
+			}
+			else {
+				g.drawString("HAI PERSO", 300, 300);
+			}
 		}
-
-
-
 
 
 	}
 
 
-
-
-
-
-
-
 }
-
-
-
-
-
-
-
-
-
 

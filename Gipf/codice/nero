@@ -6,11 +6,6 @@ connessa(X,Y,D) :- scelgo(X,Y,D).
 connessa(X,Y,1) :- connessa(X,B,1), pedina(X,Y,C,G), Y=B-2.
 nuova(X,B,C,G) :- connessa(X,Y,1), pedina(X,Y,C,G), B=Y-2.
 
-
-
-
-
-
 connessa(X,Y,2) :- connessa(A,B,2), pedina(X,Y,C,G), X=A+1, Y=B-1.
 nuova(A,B,C,G) :- connessa(X,Y,2), pedina(X,Y,C,G), A=X+1, B=Y-1.
 
