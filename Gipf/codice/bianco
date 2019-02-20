@@ -2,7 +2,6 @@ scelgo(X,Y,A) | scelgo(X,Y,B) | no(X,Y) :- start(X,Y,A,B).
 
 :- not #count { X,Y : scelgo(X,Y,A) } = 1.
 
-
 pedina(X,Y,1,0) :- scelgo(X,Y,D). 
 
 
@@ -36,35 +35,70 @@ nuova(X,Y,C,G) :- pedina(X,Y,C,G), scelgo(A,B,D), not connessa(X,Y,D).    % le p
 
 q(X,A,1,C) :- nuova(X,A,C,G), nuova(X,A+2,C,F), nuova(X,A+4,C,H), nuova(X,A+6,C,I). 
 via(X,A,1,C,G) :- quattro(X,A,1,C), nuova(X,A,C,G).
-via(X,B,1,C,G) :- nuova(X,B,C,G), via(X,A,1,C,F), B=A+2.
-via(X,B,1,C,G) :- nuova(X,B,C,G), via(X,A,1,C,F), B=A-2.
+via(X,B,1,C,G) :- nuova(X,B,C,G), via(X,A,1,D,F), B=A+2.
+via(X,B,1,C,G) :- nuova(X,B,C,G), via(X,A,1,D,F), B=A-2.
 
 q(X,Y,2,C) :- nuova(X,Y,C,G), nuova(X+1,Y-1,C,F), nuova(X+2,Y-2,C,H), nuova(X+3,Y-3,C,I).
 via(X,Y,2,C,G) :- quattro(X,Y,2,C),nuova(X,Y,C,G).
-via(X,Y,2,C,G) :- nuova(X,Y,C,G), via(A,B,2,C,F), X=A+1, Y=B-1.
-via(X,Y,2,C,G) :- nuova(X,Y,C,G), via(A,B,2,C,F), X=A-1, Y=B+1.
+via(X,Y,2,C,G) :- nuova(X,Y,C,G), via(A,B,2,D,F), X=A+1, Y=B-1.
+via(X,Y,2,C,G) :- nuova(X,Y,C,G), via(A,B,2,D,F), X=A-1, Y=B+1.
 
 q(X,Y,3,C) :- nuova(X,Y,C,G), nuova(X-1,Y-1,C,F), nuova(X-2,Y-2,C,H), nuova(X-3,Y-3,C,I).
 via(X,Y,3,C,G) :- quattro(X,Y,3,C), nuova(X,Y,C,G).
-via(X,Y,3,C,G) :- nuova(X,Y,C,G), via(A,B,3,C,F), X=A-1, Y=B-1.
-via(X,Y,3,C,G) :- nuova(X,Y,C,G), via(A,B,3,C,F), X=A+1, Y=B+1.
+via(X,Y,3,C,G) :- nuova(X,Y,C,G), via(A,B,3,D,F), X=A-1, Y=B-1.
+via(X,Y,3,C,G) :- nuova(X,Y,C,G), via(A,B,3,D,F), X=A+1, Y=B+1.
 
 
 quattro(X,Y,D,C) | noquattro(X,Y,D,C) :- q(X,Y,D,C).
 
-:- via(X,Y,D,C,G), via(X,Y,E,C,F), D!=E.
+:- via(X,Y,D,C,0), via(X,Y,E,C,0), D!=E.
 
-:~ q(X,Y,D,1), noquattro(X,Y,D,1). [1@2]
+:~ q(X,Y,D,1), noquattro(X,Y,D,1). [1@100]
 
-:~ noquattro(X,Y,D,C). [1@1]
+:~ noquattro(X,Y,D,C). [1@99]
+
+:- via(X,Y,D,C,1), via(X,Y,E,C,1), quattro(Z,W,D,B), quattro(T,Q,E,N), B!=N.
 
 finale(X,Y,C,G) :- nuova(X,Y,C,G), not via(X,Y,1,C,G), not via(X,Y,2,C,G), not via(X,Y,3,C,G).
 finale(X,Y,C,1):- via(X,Y,D,C,1), quattro(Z,W,D,C).
 
 
-catturate(N,1) :- quattro(A,B,D,0), #count { X,Y : via(X,Y,D,1,G) } = N. 
+catturate(N,1) :- quattro(A,B,D,0), #count { X,Y : via(X,Y,D,1,G), not finale(X,Y,1,G) } = N. 
 
-catturate(N,0) :- quattro(A,B,D,1), #count { X,Y : via(X,Y,D,0,G) } = N.
+catturate(N,0) :- quattro(A,B,D,1), #count { X,Y : via(X,Y,D,0,G), not finale(X,Y,0,G) } = N.
+
+
+tre(C) :- finale(X,A,C,G), finale(X,A+2,C,F), finale(X,A+4,C,H).
+tre(C) :- finale(X,Y,C,G), finale(X+1,Y-1,C,F), finale(X+2,Y-2,C,H).
+tre(C) :- finale(X,Y,C,G), finale(X-1,Y-1,C,F), finale(X-2,Y-2,C,H).
+
+due(C) :- finale(X,A,C,G), finale(X,A+2,C,F).
+due(C) :- finale(X,Y,C,G), finale(X+1,Y-1,C,F).
+due(C) :- finale(X,Y,C,G), finale(X-1,Y-1,C,F).
+
+:~ not haiFattoQuattro. [1@4]
+:~ not haiFattoTre. [1@3]
+:~ not haiFattoDue. [1@2]
+
+haiFattoDue :- due(1).
+haiFattoTre :- tre(1).
+haiFattoQuattro :- quattro(X,Y,1,G).
+
+
+haFattoDue :- due(0).
+haFattoTre :- tre(0).
+
+:~ haFattoTre. [1@3]
+
+
+:~ finale(X,Y,0,G). [1@6,X,Y]
+
+:~ finale(X,Y,0,1). [1@7,X,Y]
+
+:~ finale(X,Y,1,G). [1@3,X,Y]     % sotto il tre non va
+
+
+
 
 
 

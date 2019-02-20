@@ -55,7 +55,7 @@ public class Pannello extends JPanel {
 	static Handler handler;  
 
 	Gestore gestoreTurni;
-	
+
 	Image scacchiera, damaNera, damaBianca, puntoRosso, puntoVerde, Iscelta, gipfNero, gipfBianco;
 
 	public Pannello() {
@@ -83,7 +83,7 @@ public class Pannello extends JPanel {
 		gestoreTurni = new Gestore(this);
 		gestoreTurni.start();
 	}
-	
+
 	public void initGUI() {
 		this.setFocusable(true);
 		try {
@@ -258,8 +258,8 @@ public class Pannello extends JPanel {
 
 	}
 
-	
-	
+
+
 	public void muoviBianco() {
 		handler.removeAll();
 
@@ -295,7 +295,7 @@ public class Pannello extends JPanel {
 		AnswerSets answers = (AnswerSets) o;
 
 		sceltadlv = new Scelgo(100,100,10);      // se non c'è nessuno scelgo
-		
+
 		for(AnswerSet a : answers.getAnswersets()){
 			try {
 				for(Object obj : a.getAtoms()) {
@@ -347,12 +347,12 @@ public class Pannello extends JPanel {
 						}
 					}
 				}
-				
+
 			} catch (Exception e) {
 				e.printStackTrace();
 			} 
 		}
-		
+
 		verifica();
 	}
 
@@ -386,94 +386,57 @@ public class Pannello extends JPanel {
 		for(AnswerSet p : answers.getAnswersets()) {
 			try {
 
-				for(Object object : p.getAtoms()) {
-					if(object instanceof Direzione) {    // eccezione (più direzioni in cui si può mangiare)
-						deviScegliere = true;
-					}
-					if(object instanceof Catturate) {
-						if(((Catturate)object).getColore() == 0 ) {
-							catturateNere += ((Catturate) object).getNumero();
-						}
-						else {
-							catturateBianche += ((Catturate) object).getNumero();
-						}
-					}
-				}
-
 				ripristina(pedineNere,0);
 				ripristina(pedineBianche,1);
 
-				if(deviScegliere) {
-					for(Object op : p.getAtoms()) {
-						if(op instanceof Nuova) {
-							Nuova pedina = (Nuova) op;
-							if(pedina.getColore()==1) {
-								finitePedineBianche = true;
-								for(Pedina bianca : pedineBianche) {
-									if(bianca.getX()==8 && bianca.getY()==0) {
-										finitePedineBianche = false;
-										bianca.setX(pedina.getX());
-										bianca.setY(pedina.getY());
-										bianca.setGipf(pedina.getGipf());
-										break;
-									}
+				for(Object op : p.getAtoms()) {
+
+					if(op instanceof Direzione) {    // eccezione (più direzioni in cui si può mangiare)
+						if(((Direzione)op).getD() == 4) {
+							deviScegliere = true;							
+						}
+					}
+
+					if(op instanceof Nuova) {
+						Nuova pedina = (Nuova) op;
+						if(pedina.getColore()==1) {
+							finitePedineBianche = true;
+							for(Pedina bianca : pedineBianche) {
+								if(bianca.getX()==8 && bianca.getY()==0) {
+									finitePedineBianche = false;
+									bianca.setX(pedina.getX());
+									bianca.setY(pedina.getY());
+									bianca.setGipf(pedina.getGipf());
+									break;
 								}
 							}
-							else {
-								finitePedineNere = true;
-								for(Pedina nera : pedineNere) {
-									if(nera.getX()==0 && nera.getY()==0) {
-										finitePedineNere = false;
-										nera.setX(pedina.getX());
-										nera.setY(pedina.getY());
-										nera.setGipf(pedina.getGipf());
-										break;
-									}
+						}
+						else {
+							finitePedineNere = true;
+							for(Pedina nera : pedineNere) {
+								if(nera.getX()==0 && nera.getY()==0) {
+									finitePedineNere = false;
+									nera.setX(pedina.getX());
+									nera.setY(pedina.getY());
+									nera.setGipf(pedina.getGipf());
+									break;
 								}
 							}
 						}
 					}
-					System.out.println("scegli la direzione");
 				}
-				else {
-					for(Object op : p.getAtoms()) {
-						if(op instanceof Finale) {
-							Finale pedina = (Finale) op;
-							if(pedina.getColore()==1) {
-								finitePedineBianche = true;
-								for(Pedina bianca : pedineBianche) {
-									if(bianca.getX()==8 && bianca.getY()==0) {
-										finitePedineBianche = false;
-										bianca.setX(pedina.getX());
-										bianca.setY(pedina.getY());
-										bianca.setGipf(pedina.getGipf());
-										break;
-									}
-								}
-							}
-							else {
-								finitePedineNere = true;
-								for(Pedina nera : pedineNere) {
-									if(nera.getX()==0 && nera.getY()==0) {
-										finitePedineNere = false;
-										nera.setX(pedina.getX());
-										nera.setY(pedina.getY());
-										nera.setGipf(pedina.getGipf());
-										break;
-									}
-								}
-							}
-						}
-					}	
-					gestoreTurni.rilascia();
-				}
-				
+
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
 
-		verifica();
+		if(!deviScegliere) {
+			muoviNero2();
+		}
+		else {
+			System.out.println("scegli la direzione");
+		}
 
 	}
 
@@ -555,14 +518,14 @@ public class Pannello extends JPanel {
 				ex.printStackTrace();
 			}
 		}
-		
+
 		verifica();
-		
+
 		gestoreTurni.rilascia();
 
 	}
 
-	
+
 	public static void ripristina(ArrayList<Pedina> lista, int colore) {
 		lista.clear();
 
@@ -586,7 +549,7 @@ public class Pannello extends JPanel {
 		return 0;
 	}
 
-	
+
 	public void verifica() {
 		if(finitePedineBianche) {
 			vintoNero = true;
@@ -611,8 +574,8 @@ public class Pannello extends JPanel {
 			vintoBianco = true;
 		}
 	}
-	
-	
+
+
 	@Override
 	public void paint(Graphics g) {
 		super.paint(g);

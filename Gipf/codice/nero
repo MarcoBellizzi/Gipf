@@ -44,18 +44,7 @@ via(X,Y,3,D,G) :- nuova(X,Y,D,G), via(A,B,3,C,F), X=A-1, Y=B-1.
 via(X,Y,3,D,G) :- nuova(X,Y,D,G), via(A,B,3,C,F), X=A+1, Y=B+1.
 
 
-direzione(4) :- via(X,Y,D,0,G), via(X,Y,E,0,F), D!=E.   % fare la scelta
+direzione(4) :- via(X,Y,D,0,0), via(X,Y,E,0,0), D!=E.   % fare la scelta
+direzione(5) :- not direzione(4).
 
-
-finale(X,Y,C,G) :- nuova(X,Y,C,G), not via(X,Y,1,C,G), not via(X,Y,2,C,G), not via(X,Y,3,C,G), not direzione(4).
-finale(X,Y,C,1):- via(X,Y,D,C,1), quattro(Z,W,D,C), not direzione(4).
-
-
-catturate(N,1) :- quattro(A,B,D,0), #count { X,Y : via(X,Y,D,1,G) } = N, not direzione(4). 
-
-catturate(N,0) :- quattro(A,B,D,1), #count { X,Y : via(X,Y,D,0,G) } = N, not direzione(4). 
-
-
-attento(F,D):- via(X,Y,D,1,G), via(X,Y,F,1,G), D!=G,quattro(Z,W,D,0),quattro(T,Q,F,1).
-finale(X,Y,1,G):- via(X,Y,F,1,G), attento(F,D), not via (X,Y,D,1,0), not via(X,Y,D,1,1).
 

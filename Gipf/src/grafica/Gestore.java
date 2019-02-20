@@ -19,7 +19,7 @@ public class Gestore extends Thread {
 	
 			try {
 				if(muovi) {
-					sleep(3000);
+					sleep(2000);
 					pannello.muoviBianco();				
 					muovi = false;
 				}
