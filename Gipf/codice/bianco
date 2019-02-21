@@ -87,11 +87,14 @@ haiFattoQuattro :- quattro(X,Y,D,1).
 
 haFattoTre :- tre(0).
 
-:~ haFattoTre. [1@7]
+:~ haFattoTre. [1@8]
 
-:~ finale(X,Y,0,G). [1@5,X,Y]
+:~ finale(X,Y,0,0). [1@5,X,Y]
 
-:~ catturate(N,1). [N@6]
+:~ finale(X,Y,0,1). [1@6,X,Y]
+
+
+:~ catturate(N,1). [N@7]
 
 
 
