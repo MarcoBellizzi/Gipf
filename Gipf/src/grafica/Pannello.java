@@ -370,6 +370,13 @@ public class Pannello extends JPanel {
 			for(Pedina pedina : pedineBianche) {
 				facts.addObjectInput(pedina);
 			}
+			for(Start punto : listaStart) {
+				try {
+					facts.addObjectInput(punto);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}	
+			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -432,6 +439,7 @@ public class Pannello extends JPanel {
 		}
 
 		if(!deviScegliere) {
+			verifica();
 			muoviNero2();
 		}
 		else {
@@ -649,7 +657,7 @@ public class Pannello extends JPanel {
 			if(vintoNero) {
 				g.drawString("HAI VINTO", 300, 300);				
 			}
-			else {
+			if(vintoBianco) {
 				g.drawString("HAI PERSO", 300, 300);
 			}
 		}

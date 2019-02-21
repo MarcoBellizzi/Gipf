@@ -74,7 +74,7 @@ public class Start {
 		y -= 70;
 		int X = this.x*60;
 		int Y = this.y*35;
-		return x > X-10 && x < X+10 && y > Y-10 && y < Y+10;
+		return x > X-15 && x < X+15 && y > Y-15 && y < Y+15;
 	}
 	
 }
