@@ -56,7 +56,7 @@ public class Pannello extends JPanel {
 
 	Gestore gestoreTurni;
 
-	Image scacchiera, damaNera, damaBianca, puntoRosso, puntoVerde, Iscelta, gipfNero, gipfBianco;
+	Image scacchiera, damaNera, damaBianca, puntoRosso, puntoVerde, Iscelta, gipfNero, gipfBianco, gameOver, youWin;
 
 	public Pannello() {
 		initGame();
@@ -95,6 +95,8 @@ public class Pannello extends JPanel {
 			Iscelta = ImageIO.read(new File("src/grafica/scelta.png"));
 			gipfBianco = ImageIO.read(new File("src/grafica/gipfBianco.png"));
 			gipfNero = ImageIO.read(new File("src/grafica/gipfNero.png"));
+			gameOver = ImageIO.read(new File("src/grafica/gameOver.png"));
+			youWin = ImageIO.read(new File("src/grafica/youWin.png"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -655,10 +657,10 @@ public class Pannello extends JPanel {
 		}
 		else {
 			if(vintoNero) {
-				g.drawString("HAI VINTO", 300, 300);				
+				g.drawImage(youWin, 0, 0, 700, 680, this);				
 			}
 			if(vintoBianco) {
-				g.drawString("HAI PERSO", 300, 300);
+				g.drawImage(gameOver, 0, 0, 700, 680, this);
 			}
 		}
 
