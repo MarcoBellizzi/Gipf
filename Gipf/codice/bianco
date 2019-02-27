@@ -57,10 +57,11 @@ quattro(X,Y,D,C) | noquattro(X,Y,D,C) :- q(X,Y,D,C).
 
 :~ noquattro(X,Y,D,C). [1@99,X,Y,D,C]
 
-:- via(X,Y,D,C,1), via(X,Y,E,C,1), quattro(Z,W,D,B), quattro(T,Q,E,N), B!=N.
+:- via(X,Y,D,C,1), via(X,Y,E,C,1), quattro(Z,W,D,B), quattro(T,Q,E,N), B!=N.   % intersezione gipf colori diversi
+
 
 finale(X,Y,C,G) :- nuova(X,Y,C,G), not via(X,Y,1,C,G), not via(X,Y,2,C,G), not via(X,Y,3,C,G).
-finale(X,Y,C,1):- via(X,Y,D,C,1), quattro(Z,W,D,C).
+finale(X,Y,C,1):- via(X,Y,D,C,1), quattro(Z,W,D,C).    % i gipf rimangono in campo
 
 
 catturate(N,1) :- quattro(A,B,D,0), #count { X,Y : via(X,Y,D,1,G), not finale(X,Y,1,G) } = N. 
@@ -89,14 +90,10 @@ haFattoTre :- tre(0).
 
 :~ haFattoTre. [1@8]
 
-:~ finale(X,Y,0,0). [1@5,X,Y]
+:~ finale(X,Y,0,0). [1@5,X,Y]     % quando puoi cattura una pedina
 
-:~ finale(X,Y,0,1). [1@6,X,Y]
-
-
-:~ catturate(N,1). [N@7]
+:~ finale(X,Y,0,1). [1@6,X,Y]      % quando puoi cattura un gipf
 
 
-
-
+:~ catturate(N,1). [N@7]    % non creare un quattro nero in cui perdi pedine
 

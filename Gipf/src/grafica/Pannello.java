@@ -2,14 +2,13 @@ package grafica;
 
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
-import java.io.File;
-import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 
-import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 import it.unical.mat.embasp.base.Handler;
@@ -21,7 +20,13 @@ import it.unical.mat.embasp.languages.asp.AnswerSet;
 import it.unical.mat.embasp.languages.asp.AnswerSets;
 import it.unical.mat.embasp.platforms.desktop.DesktopHandler;
 import it.unical.mat.embasp.specializations.dlv2.desktop.DLV2DesktopService;
-import logica.*;
+import logica.Catturate;
+import logica.Direzione;
+import logica.Finale;
+import logica.Nuova;
+import logica.Pedina;
+import logica.Scelgo;
+import logica.Start;
 
 public class Pannello extends JPanel {
 
@@ -37,10 +42,10 @@ public class Pannello extends JPanel {
 
 	Scelgo sceltadlv;
 
-	static int scelta;   // per la direzione in cui mangiare se ce ne sono due
+	static int scelta;   // per la direzione da considerare nel caso di intersezioni
 	static boolean deviScegliere;
 
-	boolean scelto;   // posizionamento pediana nero
+	boolean scelto;   // posizionamento pediana nera
 
 	static int catturateBianche;
 	static int catturateNere;
@@ -86,22 +91,25 @@ public class Pannello extends JPanel {
 
 	public void initGUI() {
 		this.setFocusable(true);
-		try {
-			scacchiera = ImageIO.read(new File("src/grafica/scacchiera.png"));
-			damaNera = ImageIO.read(new File("src/grafica/damaNera.png"));
-			damaBianca = ImageIO.read(new File("src/grafica/damaBianca.png"));
-			puntoRosso = ImageIO.read(new File("src/grafica/puntoRosso.png"));
-			puntoVerde = ImageIO.read(new File("src/grafica/puntoVerde.png"));
-			Iscelta = ImageIO.read(new File("src/grafica/scelta.png"));
-			gipfBianco = ImageIO.read(new File("src/grafica/gipfBianco.png"));
-			gipfNero = ImageIO.read(new File("src/grafica/gipfNero.png"));
-			gameOver = ImageIO.read(new File("src/grafica/gameOver.png"));
-			youWin = ImageIO.read(new File("src/grafica/youWin.png"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		
+			scacchiera = loadAssets("scacchiera.png");
+			damaNera = loadAssets("damaNera.png");
+			damaBianca = loadAssets("damaBianca.png");
+			puntoRosso = loadAssets("puntoRosso.png");
+			puntoVerde = loadAssets("puntoVerde.png");
+			Iscelta = loadAssets("scelta.png");
+			gipfBianco = loadAssets("gipfBianco.png");
+			gipfNero = loadAssets("gipfNero.png");
+			gameOver = loadAssets("gameOver.png");
+			youWin = loadAssets("youWin.png");
 	}
 
+	public Image loadAssets(String path) {
+		URL url = this.getClass().getResource(path);
+		Image img = Toolkit.getDefaultToolkit().getImage(url);
+		return img;
+	}
+	
 	public void initEH() {
 		this.addMouseMotionListener(new MouseMotionAdapter() {
 
@@ -109,7 +117,6 @@ public class Pannello extends JPanel {
 			public void mouseMoved(MouseEvent e) {
 				Pannello.x = e.getX();
 				Pannello.y = e.getY();
-				repaint();
 			}
 
 		});
@@ -131,11 +138,11 @@ public class Pannello extends JPanel {
 						int dir2 = punto.getDirezione2();
 
 						if(dir1 == 1) suggerimento[0].set(x,y-2,dir1);
-						if(dir1 == 2)  suggerimento[0].set(x+1,y-1,dir1);
+						if(dir1 == 2) suggerimento[0].set(x+1,y-1,dir1);
 						if(dir1 == 3) suggerimento[0].set(x+1,y+1,dir1);
 						if(dir1 == 4) suggerimento[0].set(x,y+2,dir1);
 						if(dir1 == 5) suggerimento[0].set(x-1,y+1,dir1);
-						if(dir1 == 6)  suggerimento[0].set(x-1,y-1,dir1);
+						if(dir1 == 6) suggerimento[0].set(x-1,y-1,dir1);
 
 						if(dir1==dir2) {
 							suggerimento[1].set(100, 100, 1);       // non farlo vedere
@@ -180,7 +187,7 @@ public class Pannello extends JPanel {
 			for(int j=0; j<17; j++) {
 				if(i%2 == j%2) {
 					if(i==0 && j==4) {
-						listaStart.add(new Start(i,j,3));
+						listaStart.add(new Start(i,j,3));             // inizializza gli start
 					}
 					else if(i+j==4 && i!=0 && i!=4) {
 						listaStart.add(new Start(i,j,3, 4));
@@ -223,7 +230,7 @@ public class Pannello extends JPanel {
 		for(int i=0; i<12; i++) {
 			pedineNere.add(new Pedina(0,0,0,0));
 		}
-		pedineNere.add(new Pedina(4,2,0,1));
+		pedineNere.add(new Pedina(4,2,0,1));     // gipf
 		pedineNere.add(new Pedina(7,11,0,1));
 		pedineNere.add(new Pedina(1,11,0,1));
 
