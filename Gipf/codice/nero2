@@ -1,33 +1,35 @@
-q(X,A,1,C) :- pedina(X,A,C,G), pedina(X,A+2,C,F), pedina(X,A+4,C,H), pedina(X,A+6,C,I). 
+quattro(X,A,1,C) :- pedina(X,A,C,G), pedina(X,A+2,C,F), pedina(X,A+4,C,H), pedina(X,A+6,C,I). 
 via(X,A,1,C,G) :- quattro(X,A,1,C), pedina(X,A,C,G).
 via(X,B,1,C,G) :- pedina(X,B,C,G), via(X,A,1,D,F), B=A+2.
 via(X,B,1,C,G) :- pedina(X,B,C,G), via(X,A,1,D,F), B=A-2.
 
-q(X,Y,2,C) :- pedina(X,Y,C,G), pedina(X+1,Y-1,C,F), pedina(X+2,Y-2,C,H), pedina(X+3,Y-3,C,I).
+quattro(X,Y,2,C) :- pedina(X,Y,C,G), pedina(X+1,Y-1,C,F), pedina(X+2,Y-2,C,H), pedina(X+3,Y-3,C,I).
 via(X,Y,2,C,G) :- quattro(X,Y,2,C), pedina(X,Y,C,G).
 via(X,Y,2,C,G) :- pedina(X,Y,C,G), via(A,B,2,D,F), X=A+1, Y=B-1.
 via(X,Y,2,C,G) :- pedina(X,Y,C,G), via(A,B,2,D,F), X=A-1, Y=B+1.
 
-q(X,Y,3,C) :- pedina(X,Y,C,G), pedina(X-1,Y-1,C,F), pedina(X-2,Y-2,C,H), pedina(X-3,Y-3,C,I).
+quattro(X,Y,3,C) :- pedina(X,Y,C,G), pedina(X-1,Y-1,C,F), pedina(X-2,Y-2,C,H), pedina(X-3,Y-3,C,I).
 via(X,Y,3,C,G) :- quattro(X,Y,3,C), pedina(X,Y,C,G).
 via(X,Y,3,C,G) :- pedina(X,Y,C,G), via(A,B,3,D,F), X=A-1, Y=B-1.
 via(X,Y,3,C,G) :- pedina(X,Y,C,G), via(A,B,3,D,F), X=A+1, Y=B+1.
 
-quattro(X,Y,D,C):- q(X,Y,D,C), direzione(D).
+quattrofinali(X,Y,D,0):- quattro(X,Y,D,0),  direzione(D).
 
-quattro(X,Y,D,C) | noquattro(X,Y,D,C) :- q(X,Y,D,C).
+quattrofinali(X,Y,D,1):- quattro(X,Y,D,1), not intersezione(D).
 
-:- via(X,Y,D,C,0), via(X,Y,E,C,0), D!=E.
+quattrofinali(X,Y,D,0):- quattro(X,Y,D,0), not intersezioneneri(D). 
 
-:~ q(X,Y,D,0), noquattro(X,Y,D,0). [1@2]
+viafinale(X,Y,D,C,G):- via(X,Y,D,C,G), quattrofinali(Z,W,D,R).
 
-:~ noquattro(X,Y,D,C). [1@1]
 
-:- via(X,Y,D,C,1), via(X,Y,E,C,1), quattro(Z,W,D,B), quattro(T,Q,E,N), B!=N.
+intersezione(D):- via(X,Y,D,1,G), via(X,Y,E,0,G), D!=E.
 
-finale(X,Y,C,G) :- pedina(X,Y,C,G), not via(X,Y,1,C,G), not via(X,Y,2,C,G), not via(X,Y,3,C,G).
+intersezioneneri(D):- via(X,Y,D,0,0), via(X,Y,E,0,0), D!=E.
 
-finale(X,Y,C,1):- via(X,Y,D,C,1), quattro(Z,W,D,C).
+
+finale(X,Y,C,G) :- pedina(X,Y,C,G), not viafinale(X,Y,1,C,G), not viafinale(X,Y,2,C,G), not viafinale(X,Y,3,C,G).
+
+finale(X,Y,C,1):- viafinale(X,Y,D,C,1), quattrofinali(Z,W,D,C).
 
 
 catturate(N,1) :- quattro(A,B,D,0), #count { X,Y : via(X,Y,D,1,G), not finale(X,Y,1,G) } = N. 
