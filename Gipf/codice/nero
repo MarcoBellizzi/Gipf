@@ -45,6 +45,5 @@ via(X,Y,3,D,G) :- nuova(X,Y,D,G), via(A,B,3,C,F), X=A+1, Y=B+1.
 
 
 direzione(4) :- via(X,Y,D,0,0), via(X,Y,E,0,0), D!=E.   % fare la scelta
-direzione(5) :- not direzione(4).
 
 

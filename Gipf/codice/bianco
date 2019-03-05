@@ -89,7 +89,7 @@ due(C) :- finale(X,Y,C,G), finale(X-1,Y-1,C,F).
 
 haiFattoDue :- due(1).
 haiFattoTre :- tre(1).
-haiFattoQuattro :- quattro(X,Y,D,1).
+haiFattoQuattro :- quattrofinale(X,Y,D,1).
 
 
 haFattoTre :- tre(0).
