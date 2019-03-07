@@ -100,6 +100,5 @@ haFattoTre :- tre(0).
 
 :~ finale(X,Y,0,1). [1@6,X,Y]      % quando puoi cattura un gipf
 
-
 :~ catturate(N,1). [N@7]    % non creare un quattro nero in cui perdi pedine
 
