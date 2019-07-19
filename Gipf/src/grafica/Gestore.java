@@ -8,7 +8,7 @@ public class Gestore extends Thread {
 	public Gestore(Pannello pannello) {
 		this.pannello = pannello;
 		muovi = false;
-	}
+	} 
 
 	@Override
 	public void run() {
