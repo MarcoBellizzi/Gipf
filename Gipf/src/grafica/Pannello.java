@@ -106,8 +106,7 @@ public class Pannello extends JPanel {
 
 	public Image loadAssets(String path) {
 		URL url = this.getClass().getResource(path);
-		Image img = Toolkit.getDefaultToolkit().getImage(url);
-		return img;
+		return Toolkit.getDefaultToolkit().getImage(url);
 	}
 	
 	public void initEH() {
@@ -380,11 +379,7 @@ public class Pannello extends JPanel {
 				facts.addObjectInput(pedina);
 			}
 			for(Start punto : listaStart) {
-				try {
-					facts.addObjectInput(punto);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}	
+				facts.addObjectInput(punto);
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();

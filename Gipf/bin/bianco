@@ -1,0 +1,104 @@
+scelgo(X,Y,A) | scelgo(X,Y,B) | no(X,Y) :- start(X,Y,A,B).
+
+:- not #count { X,Y : scelgo(X,Y,A) } = 1.
+
+pedina(X,Y,1,0) :- scelgo(X,Y,D). 
+
+
+connessa(X,Y,D) :- scelgo(X,Y,D).
+
+
+connessa(X,Y,1) :- connessa(X,B,1), pedina(X,Y,C,G), Y=B-2.
+nuova(X,B,C,G) :- connessa(X,Y,1), pedina(X,Y,C,G), B=Y-2.
+
+connessa(X,Y,2) :- connessa(A,B,2), pedina(X,Y,C,G), X=A+1, Y=B-1.
+nuova(A,B,C,G) :- connessa(X,Y,2), pedina(X,Y,C,G), A=X+1, B=Y-1.
+
+connessa(X,Y,3) :- connessa(A,B,3), pedina(X,Y,C,G), X=A+1, Y=B+1.
+nuova(A,B,C,G) :- connessa(X,Y,3), pedina(X,Y,C,G), A=X+1, B=Y+1.
+
+connessa(X,Y,4) :- connessa(X,B,4), pedina(X,Y,C,G), Y=B+2.
+nuova(X,B,C,G) :- connessa(X,Y,4), pedina(X,Y,C,G), B=Y+2.
+
+connessa(X,Y,5) :- connessa(A,B,5), pedina(X,Y,C,G), X=A-1, Y=B+1.
+nuova(A,B,C,G) :- connessa(X,Y,5), pedina(X,Y,C,G), A=X-1, B=Y+1.
+
+connessa(X,Y,6) :- connessa(A,B,6), pedina(X,Y,C,G), X=A-1, Y=B-1.
+nuova(A,B,C,G) :- connessa(X,Y,6), pedina(X,Y,C,G), A=X-1, B=Y-1.
+
+
+:- nuova(X,Y,C,G), start(X,Y,A,B).  % per il bordo
+
+
+nuova(X,Y,C,G) :- pedina(X,Y,C,G), scelgo(A,B,D), not connessa(X,Y,D).    % le pedine non spostate
+
+
+quattro(X,A,1,C) :- nuova(X,A,C,G), nuova(X,A+2,C,F), nuova(X,A+4,C,H), nuova(X,A+6,C,I). 
+via(X,A,1,C,G) :- quattro(X,A,1,C), nuova(X,A,C,G).
+via(X,B,1,C,G) :- nuova(X,B,C,G), via(X,A,1,D,F), B=A+2.
+via(X,B,1,C,G) :- nuova(X,B,C,G), via(X,A,1,D,F), B=A-2.
+
+quattro(X,Y,2,C) :- nuova(X,Y,C,G), nuova(X+1,Y-1,C,F), nuova(X+2,Y-2,C,H), nuova(X+3,Y-3,C,I).
+via(X,Y,2,C,G) :- quattro(X,Y,2,C),nuova(X,Y,C,G).
+via(X,Y,2,C,G) :- nuova(X,Y,C,G), via(A,B,2,D,F), X=A+1, Y=B-1.
+via(X,Y,2,C,G) :- nuova(X,Y,C,G), via(A,B,2,D,F), X=A-1, Y=B+1.
+
+quattro(X,Y,3,C) :- nuova(X,Y,C,G), nuova(X-1,Y-1,C,F), nuova(X-2,Y-2,C,H), nuova(X-3,Y-3,C,I).
+via(X,Y,3,C,G) :- quattro(X,Y,3,C), nuova(X,Y,C,G).
+via(X,Y,3,C,G) :- nuova(X,Y,C,G), via(A,B,3,D,F), X=A-1, Y=B-1.
+via(X,Y,3,C,G) :- nuova(X,Y,C,G), via(A,B,3,D,F), X=A+1, Y=B+1.
+
+
+
+quattrofinale(X,Y,D,0):- quattro(X,Y,D,0), not intersezione(D).
+
+quattrofinale(X,Y,D,1):- quattro(X,Y,D,1), not intersezionebianchi(D). 
+
+intersezione(E):- via(X,Y,D,1,G), via(X,Y,E,0,G), D!=E.
+
+intersezionebianchi(D):- via(X,Y,D,1,0), via(X,Y,E,1,0), D!=E.
+
+quattrofinaleb(X,Y,D,1) | noquattrofinale(X,Y,D,1) :- quattro(X,Y,D,1), intersezionebianchi(D).
+
+:- not #count{ X,Y : quattrofinaleb(X,Y,D,1)}=1 , intersezionebianchi(F).
+
+quattrofinale(X,Y,D,C):- quattrofinaleb(X,Y,D,C). 
+
+viafinale (X,Y,D,C,G):- via(X,Y,D,C,G), quattrofinale(Z,W,D,F).
+
+finale(X,Y,C,G) :- nuova(X,Y,C,G), not viafinale(X,Y,1,C,G), not viafinale(X,Y,2,C,G), not viafinale(X,Y,3,C,G).
+finale(X,Y,C,1):- viafinale(X,Y,D,C,1), quattrofinale(Z,W,D,C).    % i gipf rimangono in campo
+
+
+catturate(N,1) :- quattrofinale(A,B,D,0), #count { X,Y : viafinale(X,Y,D,1,G), not finale(X,Y,1,G) } = N. 
+
+catturate(N,0) :- quattrofinale(A,B,D,1), #count { X,Y : viafinale(X,Y,D,0,G), not finale(X,Y,0,G) } = N.
+
+
+tre(C) :- finale(X,A,C,G), finale(X,A+2,C,F), finale(X,A+4,C,H).
+tre(C) :- finale(X,Y,C,G), finale(X+1,Y-1,C,F), finale(X+2,Y-2,C,H).
+tre(C) :- finale(X,Y,C,G), finale(X-1,Y-1,C,F), finale(X-2,Y-2,C,H).
+
+due(C) :- finale(X,A,C,G), finale(X,A+2,C,F).
+due(C) :- finale(X,Y,C,G), finale(X+1,Y-1,C,F).
+due(C) :- finale(X,Y,C,G), finale(X-1,Y-1,C,F).
+
+:~ not haiFattoQuattro. [1@4]
+:~ not haiFattoTre. [1@3]
+:~ not haiFattoDue. [1@2]
+
+haiFattoDue :- due(1).
+haiFattoTre :- tre(1).
+haiFattoQuattro :- quattrofinale(X,Y,D,1).
+
+
+haFattoTre :- tre(0).
+
+:~ haFattoTre. [1@8]
+
+:~ finale(X,Y,0,0). [1@5,X,Y]     % quando puoi cattura una pedina
+
+:~ finale(X,Y,0,1). [1@6,X,Y]      % quando puoi cattura un gipf
+
+:~ catturate(N,1). [N@7]    % non creare un quattro nero in cui perdi pedine
+

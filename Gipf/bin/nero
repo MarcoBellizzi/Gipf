@@ -1,0 +1,49 @@
+pedina(X,Y,0,0) :- scelgo(X,Y,D). 
+
+connessa(X,Y,D) :- scelgo(X,Y,D).
+
+
+connessa(X,Y,1) :- connessa(X,B,1), pedina(X,Y,C,G), Y=B-2.
+nuova(X,B,C,G) :- connessa(X,Y,1), pedina(X,Y,C,G), B=Y-2.
+
+connessa(X,Y,2) :- connessa(A,B,2), pedina(X,Y,C,G), X=A+1, Y=B-1.
+nuova(A,B,C,G) :- connessa(X,Y,2), pedina(X,Y,C,G), A=X+1, B=Y-1.
+
+connessa(X,Y,3) :- connessa(A,B,3), pedina(X,Y,C,G), X=A+1, Y=B+1.
+nuova(A,B,C,G) :- connessa(X,Y,3), pedina(X,Y,C,G), A=X+1, B=Y+1.
+
+connessa(X,Y,4) :- connessa(X,B,4), pedina(X,Y,C,G), Y=B+2.
+nuova(X,B,C,G) :- connessa(X,Y,4), pedina(X,Y,C,G), B=Y+2.
+
+connessa(X,Y,5) :- connessa(A,B,5), pedina(X,Y,C,G), X=A-1, Y=B+1.
+nuova(A,B,C,G) :- connessa(X,Y,5), pedina(X,Y,C,G), A=X-1, B=Y+1.
+
+connessa(X,Y,6) :- connessa(A,B,6), pedina(X,Y,C,G), X=A-1, Y=B-1.
+nuova(A,B,C,G) :- connessa(X,Y,6), pedina(X,Y,C,G), A=X-1, B=Y-1.
+
+
+:- nuova(X,Y,C,G), start(X,Y,A,B).  % per il bordo
+
+
+nuova(X,Y,C,G) :- pedina(X,Y,C,G), scelgo(A,B,D), not connessa(X,Y,D).    % le pedine non spostate
+
+
+quattro(X,A,1,C) :- nuova(X,A,C,G), nuova(X,A+2,C,F), nuova(X,A+4,C,H), nuova(X,A+6,C,I). 
+via(X,A,1,C,G) :- quattro(X,A,1,C), nuova(X,A,C,G).
+via(X,B,1,D,G) :- nuova(X,B,D,G), via(X,A,1,C,F), B=A+2.
+via(X,B,1,D,G) :- nuova(X,B,D,G), via(X,A,1,C,F), B=A-2.
+
+quattro(X,Y,2,C) :- nuova(X,Y,C,G), nuova(X+1,Y-1,C,F), nuova(X+2,Y-2,C,H), nuova(X+3,Y-3,C,I).
+via(X,Y,2,C,G) :- quattro(X,Y,2,C), nuova(X,Y,C,G).
+via(X,Y,2,D,G) :- nuova(X,Y,D,G), via(A,B,2,C,F), X=A+1, Y=B-1.
+via(X,Y,2,D,G) :- nuova(X,Y,D,G), via(A,B,2,C,F), X=A-1, Y=B+1.
+
+quattro(X,Y,3,C) :- nuova(X,Y,C,G), nuova(X-1,Y-1,C,F), nuova(X-2,Y-2,C,H), nuova(X-3,Y-3,C,I).
+via(X,Y,3,C,G) :- quattro(X,Y,3,C), nuova(X,Y,C,G).
+via(X,Y,3,D,G) :- nuova(X,Y,D,G), via(A,B,3,C,F), X=A-1, Y=B-1.
+via(X,Y,3,D,G) :- nuova(X,Y,D,G), via(A,B,3,C,F), X=A+1, Y=B+1.
+
+
+direzione(4) :- via(X,Y,D,0,0), via(X,Y,E,0,0), D!=E.   % fare la scelta
+
+
