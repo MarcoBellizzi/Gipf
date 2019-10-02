@@ -298,7 +298,7 @@ public class Pannello extends JPanel {
 		InputProgram encoding = new ASPInputProgram();
 		encoding.addFilesPath("codice/bianco");
 		handler.addProgram(encoding);
-
+		
 		Output o =  handler.startSync(); 
 		AnswerSets answers = (AnswerSets) o;
 
