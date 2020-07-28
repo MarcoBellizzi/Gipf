@@ -6,6 +6,7 @@ import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -249,7 +250,7 @@ public class Pannello extends JPanel {
 	}
 
 	public void initDlv() {
-		handler = new DesktopHandler(new DLV2DesktopService("lib/dlv2"));
+		handler = new DesktopHandler(new DLV2DesktopService("lib" + File.separator + "dlv2"));
 
 		// register the class for reflection
 		try {
@@ -296,7 +297,7 @@ public class Pannello extends JPanel {
 		handler.addProgram(facts);
 
 		InputProgram encoding = new ASPInputProgram();
-		encoding.addFilesPath("codice/bianco");
+		encoding.addFilesPath("codice" + File.separator + "bianco");
 		handler.addProgram(encoding);
 		
 		Output o =  handler.startSync(); 
@@ -388,7 +389,7 @@ public class Pannello extends JPanel {
 		handler.addProgram(facts);
 
 		InputProgram encoding = new ASPInputProgram();
-		encoding.addFilesPath("codice/nero");
+		encoding.addFilesPath("codice" + File.separator + "nero");
 		handler.addProgram(encoding);
 
 		Output o =  handler.startSync();
@@ -473,7 +474,7 @@ public class Pannello extends JPanel {
 		handler.addProgram(facts);
 
 		InputProgram encoding = new ASPInputProgram();
-		encoding.addFilesPath("codice/nero2");
+		encoding.addFilesPath("codice" + File.separator + "nero2");
 		handler.addProgram(encoding);
 
 		Output o =  handler.startSync(); 
